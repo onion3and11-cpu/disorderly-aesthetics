@@ -513,10 +513,11 @@ let audioEnabled = true;
 const SoundManager = {
     masterGain: audioCtx.createGain(),
     bgmInterval: null,
+    initialized: false,
     
     init() {
-        this.masterGain.connect(audioCtx.destination);
-        this.masterGain.gain.value = 0.5; 
+        if (!this.initialized) { this.masterGain.connect(audioCtx.destination); this.initialized = true; }
+        this.masterGain.gain.value = audioEnabled ? 0.5 : 0;
         if (audioCtx.state === 'suspended') audioCtx.resume();
     },
     toggleMute() {
@@ -942,18 +943,18 @@ function startGame(era = 'PREHISTORIC') {
     state.gameState='PLAYING'; state.running=true; state.paused=false; state.shopOpen=false;
     state.currentEra=era; state.eraKills=0; state.eraTarget=cfg.target; state.eraBossSpawned=false; state.eraComplete=false;
     state.score=0; state.level=1; state.xp=0; state.xpNeeded=100; state.coins=0;
-    state.combo=0;state.comboTimer=0;state.maxComboRun=0;state.usedStyles=new Set([1]);state.hazardTimer=0;state.anomalyCount=0;state.hitStop=0;state.bossSpawnedForLevel=false;state.talentCount=0;state.damageTaken=0;state.bossDamageSnapshot=0;state.skillUses=0;state.ultimateUses=0;state.shopPurchases=0;state.itemCount=0;state.collectedSpecialTypes=new Set();state.specialItemSpawnTimer=300;state.freezeTimer=0;state.restoreInvuln=0;state.skillCooldowns={burst:0,freeze:0,restore:0,rift:0};state.buffTimers={prism:0,mirror:0,muse:0,forbidden:0,magnet:0};
-    state.ultimateGauge=0; state.ultimateActive=false; state.ultimateStyleId=1; state.ultimatePulse=0; state.activeBoss=null; state.runStartTime=Date.now(); museumSave.totalRuns=(museumSave.totalRuns||0)+1; persistMuseumSave();
+    state.combo=0;state.comboTimer=0;state.maxComboRun=0;state.maxComboTimer=180;state.usedStyles=new Set([1]);state.hazardTimer=0;state.anomalyCount=0;state.hitStop=0;state.bossSpawnedForLevel=false;state.talentCount=0;state.damageTaken=0;state.bossDamageSnapshot=0;state.skillUses=0;state.ultimateUses=0;state.shopPurchases=0;state.itemCount=0;state.collectedSpecialTypes=new Set();state.specialItemSpawnTimer=300;state.freezeTimer=0;state.restoreInvuln=0;state.skillCooldowns={burst:0,freeze:0,restore:0,rift:0};state.buffTimers={prism:0,mirror:0,muse:0,forbidden:0,magnet:0};
+    state.ultimateGauge=0; state.ultimateActive=false; state.ultimateTimer=0; state.ultimateStyleId=1; state.ultimatePulse=0; state.activeBoss=null; state.cameraShake=0; lastShakeAt=0; state.keys={}; state.mouse.isDown=false; state.runStartTime=Date.now(); museumSave.totalRuns=(museumSave.totalRuns||0)+1; persistMuseumSave();
     updateEraHud(); updateEraProgress(); updateCampaignDots();
     uiScore.innerText=state.score;domCache.score=state.score;uiLevel.innerText=state.level;domCache.level=state.level;uiXpBar.style.width='0%';domCache.xp='0%';uiCoinDisplay.innerText=state.coins;domCache.coins=state.coins;uiUltimateBar.style.width='0%';domCache.ult='0%';uiUltimateBar.classList.remove('ultimate-ready');canvas.classList.remove('ultimate-active-filter');comboDisplay.classList.remove('opacity-100');comboDisplay.classList.add('opacity-0');bossUiEl.classList.remove('opacity-100');bossUiEl.classList.add('opacity-0');
-    player.maxHp=diffCfg().playerHp;player.hp=player.maxHp;player.x=0;player.y=0;state.camera.x=player.x-canvas.width/2;state.camera.y=player.y-canvas.height/2;player.stats={damageMult:1,speedMult:1,fireRateMult:1,projSizeMult:1,pierce:0,dashMines:false,surrealEvasion:false,orbitals:0,lifesteal:false,critChance:0,critMult:1.5,bossDamageMult:1,skillCooldownMult:1,killHeal:0,killShield:0,shieldMax:100,regen:0,defenseMult:1,xpMult:1,coinMult:1,scoreMult:1,pickupRadius:0,itemDurationMult:1,itemSpawnRate:1,executeThreshold:0,explosionOnKill:0,ultimateGainMult:1};player.shield=0;player._lastRegen=0;player.history=[];player.dashCooldown=0;player.maxDashCooldown=75;player.style=STYLES.IMPRESSIONISM;
+    player.maxHp=diffCfg().playerHp;player.hp=player.maxHp;player.x=0;player.y=0;state.camera.x=player.x-canvas.width/2;state.camera.y=player.y-canvas.height/2;player.stats={damageMult:1,speedMult:1,fireRateMult:1,projSizeMult:1,pierce:0,dashMines:false,surrealEvasion:false,orbitals:0,lifesteal:false,critChance:0,critMult:1.5,bossDamageMult:1,skillCooldownMult:1,killHeal:0,killShield:0,shieldMax:100,regen:0,defenseMult:1,xpMult:1,coinMult:1,scoreMult:1,pickupRadius:0,itemDurationMult:1,itemSpawnRate:1,executeThreshold:0,explosionOnKill:0,ultimateGainMult:1,thorns:0};player.shield=0;player._lastRegen=0;player.history=[];player.lastShot=0;player.isDashing=false;player.dashTimer=0;player.dashCooldown=0;player.maxDashCooldown=75;player.dashDir={x:0,y:0};player.style=STYLES.IMPRESSIONISM;updateUIStyle();updateStyleLensPanel();
     enemies=[];projectiles=[];enemyProjectiles=[];drops=[];damageTexts=[];splatters=[];coinsList=[];screenSplatters=[];specialItems=[];if(artifactIndicator)artifactIndicator.classList.remove('show');renderSkillHud();
     ['lobby-screen','story-screen','tutorial-screen','game-over-screen','archive-screen'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));eraSelectScreen.classList.add('hidden');eraCompleteScreen.classList.add('hidden');shopScreen.classList.add('hidden');pauseScreen.classList.add('hidden');uiLayer.classList.remove('hidden');
     if(state.campaignMode) campaignProgressEl.classList.remove('hidden'); else campaignProgressEl.classList.add('hidden');
     uiHealthBar.style.width='100%';domCache.hp='100%';uiHpText.innerText=`${player.maxHp}/${player.maxHp}`;updateUIStyle();SoundManager.startAmbientBGM();showChapterToast();
 }
 function startCampaign(){state.campaignMode=true; const firstUnfinished=ERA_ORDER.find(id=>!museumSave.completed[id])||'PREHISTORIC'; startGame(firstUnfinished);}
-function goToLobby(){SoundManager.playUI();state.gameState='LOBBY';state.running=true;state.paused=false;state.campaignMode=false;['game-over-screen','story-screen','tutorial-screen','era-complete-screen','archive-screen','era-select-screen'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));document.getElementById('lobby-screen').classList.remove('hidden');pauseScreen.classList.add('hidden');uiLayer.classList.add('hidden');shopScreen.classList.add('hidden');campaignProgressEl.classList.add('hidden');bossUiEl.classList.remove('opacity-100');bossUiEl.classList.add('opacity-0');SoundManager.stopAmbientBGM();canvas.classList.remove('ultimate-active-filter');state.currentEra=null;buildEraCards();}
+function goToLobby(){SoundManager.playUI();state.gameState='LOBBY';state.running=true;state.paused=false;state.campaignMode=false;['game-over-screen','story-screen','tutorial-screen','era-complete-screen','archive-screen','era-select-screen'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));document.getElementById('lobby-screen').classList.remove('hidden');pauseScreen.classList.add('hidden');uiLayer.classList.add('hidden');shopScreen.classList.add('hidden');campaignProgressEl.classList.add('hidden');bossUiEl.classList.remove('opacity-100');bossUiEl.classList.add('opacity-0');SoundManager.stopAmbientBGM();canvas.classList.remove('ultimate-active-filter');state.currentEra=null;enemies=[];projectiles=[];enemyProjectiles=[];drops=[];coinsList=[];specialItems=[];damageTexts=[];splatters=[];screenSplatters=[];particles=[];state.keys={};state.mouse.isDown=false;state.cameraShake=0;if(artifactIndicator)artifactIndicator.classList.remove('show');updateStyleLensPanel();buildEraCards();}
 function showEraSelect(){SoundManager.init();SoundManager.playUI();document.getElementById('lobby-screen').classList.add('hidden');eraCompleteScreen.classList.add('hidden');eraSelectScreen.classList.remove('hidden');buildEraCards();setDifficulty(state.difficulty);}
 function showEraSelectFromComplete(){state.paused=false;state.gameState='LOBBY';eraCompleteScreen.classList.add('hidden');uiLayer.classList.add('hidden');campaignProgressEl.classList.add('hidden');SoundManager.stopAmbientBGM();eraSelectScreen.classList.remove('hidden');buildEraCards();}
 function hideEraSelect(){SoundManager.playUI();eraSelectScreen.classList.add('hidden');document.getElementById('lobby-screen').classList.remove('hidden');}
@@ -1136,8 +1137,49 @@ class ScreenSplatter {
         this.size = 30 + Math.random() * 80;
         this.life = 150; this.maxLife = 150;
     }
+    draw() {
+        ctx.save(); ctx.setTransform(1,0,0,1,0,0); 
+        ctx.globalAlpha = Math.min(0.6, (this.life / 100) * 0.6); 
+        ctx.fillStyle = this.color;
+        // 使用極簡幾何取代貝茲
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+        ctx.arc(this.x - this.size*0.5, this.y + this.size*0.8, this.size*0.6, 0, Math.PI*2);
+        ctx.arc(this.x + this.size*0.4, this.y + this.size*1.2, this.size*0.4, 0, Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+    }
+    update() { this.life--; this.y += 1.5; } 
+}
 
-draw() {
+class Splatter {
+    constructor(x, y, color, size) {
+        this.x = x; this.y = y; this.color = color; this.size = size;
+        this.life = 800; this.maxLife = 800; // 降低壽命
+    }
+    draw() {
+        ctx.save(); ctx.globalAlpha = Math.min(0.5, (this.life / 300) * 0.5); 
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+        ctx.arc(this.x + this.size*0.5, this.y - this.size*0.3, this.size*0.5, 0, Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+    }
+    update() { this.life--; }
+}
+
+class Player {
+    constructor() {
+        this.x = 0; this.y = 0; this.radius = 14; this.baseSpeed = 5;
+        this.maxHp = 100; this.hp = 100; this.style = STYLES.IMPRESSIONISM;
+        this.stats={damageMult:1,speedMult:1,fireRateMult:1,projSizeMult:1,pierce:0,dashMines:false,surrealEvasion:false,orbitals:0,lifesteal:false,critChance:0,critMult:1.5,bossDamageMult:1,skillCooldownMult:1,killHeal:0,killShield:0,shieldMax:100,regen:0,defenseMult:1,xpMult:1,coinMult:1,scoreMult:1,pickupRadius:0,itemDurationMult:1,itemSpawnRate:1,executeThreshold:0,explosionOnKill:0,ultimateGainMult:1,thorns:0};this.shield=0;
+        this.lastShot = 0; this.history = [];
+        this.isDashing = false; this.dashTimer = 0; this.dashDuration = 12; this.dashCooldown = 0;
+        this.maxDashCooldown = 75; this.dashDir = {x: 0, y: 0};
+    }
+
+    draw() {
     const aimAngle = Math.atan2((state.mouse.y + state.camera.y) - this.y, (state.mouse.x + state.camera.x) - this.x);
     const pulse = 0.5 + Math.sin(performance.now() * 0.008) * 0.5;
 
@@ -1247,78 +1289,6 @@ draw() {
     }
     ctx.restore();
 }
-
-update() {
- this.life--; this.y += 1.5; } 
-}
-
-class Splatter {
-    constructor(x, y, color, size) {
-        this.x = x; this.y = y; this.color = color; this.size = size;
-        this.life = 800; this.maxLife = 800; // 降低壽命
-    }
-    draw() {
-        ctx.save(); ctx.globalAlpha = Math.min(0.5, (this.life / 300) * 0.5); 
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
-        ctx.arc(this.x + this.size*0.5, this.y - this.size*0.3, this.size*0.5, 0, Math.PI*2);
-        ctx.fill();
-        ctx.restore();
-    }
-    update() { this.life--; }
-}
-
-class Player {
-    constructor() {
-        this.x = 0; this.y = 0; this.radius = 14; this.baseSpeed = 5;
-        this.maxHp = 100; this.hp = 100; this.style = STYLES.IMPRESSIONISM;
-        this.stats={damageMult:1,speedMult:1,fireRateMult:1,projSizeMult:1,pierce:0,dashMines:false,surrealEvasion:false,orbitals:0,lifesteal:false,critChance:0,critMult:1.5,bossDamageMult:1,skillCooldownMult:1,killHeal:0,killShield:0,shieldMax:100,regen:0,defenseMult:1,xpMult:1,coinMult:1,scoreMult:1,pickupRadius:0,itemDurationMult:1,itemSpawnRate:1,executeThreshold:0,explosionOnKill:0,ultimateGainMult:1};this.shield=0;
-        this.lastShot = 0; this.history = [];
-        this.isDashing = false; this.dashTimer = 0; this.dashDuration = 12; this.dashCooldown = 0;
-        this.maxDashCooldown = 75; this.dashDir = {x: 0, y: 0};
-    }
-
-    draw() {
-        ctx.save();
-        for (let i = 0; i < this.history.length; i++) {
-            let pos = this.history[i];
-            ctx.globalAlpha = this.isDashing ? 0.6 : ((i / this.history.length) * 0.2);
-            ctx.beginPath(); ctx.arc(pos.x, pos.y, this.radius * (0.6 + i/this.history.length*0.4), 0, Math.PI * 2);
-            ctx.fillStyle = this.style.color; ctx.fill();
-        }
-        ctx.restore();
-
-        ctx.save();
-        if (this.isDashing) {
-            let angle = Math.atan2(this.dashDir.y, this.dashDir.x);
-            ctx.translate(this.x, this.y); ctx.rotate(angle);
-            ctx.scale(1.8, 0.4); ctx.translate(-this.x, -this.y);
-            ctx.shadowBlur = 30; ctx.shadowColor = '#fff';
-        }
-
-        ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        let grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
-        grad.addColorStop(0, '#fff'); grad.addColorStop(1, this.style.color);
-        ctx.fillStyle = grad;
-        
-        if (state.ultimateActive) { ctx.shadowBlur = 30; ctx.shadowColor = '#f472b6'; } 
-        else if(!this.isDashing) { ctx.shadowBlur = 15; ctx.shadowColor = this.style.color; }
-        ctx.fill();
-        
-        ctx.lineWidth = 1.5; ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.stroke();
-        
-        if (!this.isDashing) {
-            const worldMouseX = state.mouse.x + state.camera.x;
-            const worldMouseY = state.mouse.y + state.camera.y;
-            const angle = Math.atan2(worldMouseY - this.y, worldMouseX - this.x);
-            ctx.beginPath();
-            ctx.moveTo(this.x + Math.cos(angle)*this.radius, this.y + Math.sin(angle)*this.radius);
-            ctx.lineTo(this.x + Math.cos(angle) * 30, this.y + Math.sin(angle) * 30);
-            ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
-        }
-        ctx.restore();
-    }
 
     update() {
         if (this.dashCooldown > 0) {
@@ -2042,8 +2012,9 @@ function createParticles(x, y, color, count, baseAngle, spread) {
     }
 }
 
-function spawnEnemy(){const cfg=eraCfg(),df=diffCfg();const maxEnemies=Math.round((16+Math.min(state.level*3,28)+Math.floor(cfg.index/2))*df.spawn);if(enemies.length>=maxEnemies)return;
+function spawnEnemy(){const cfg=eraCfg(),df=diffCfg();const maxEnemies=Math.round((16+Math.min(state.level*3,28)+Math.floor(cfg.index/2))*df.spawn);
  if(state.eraKills>=state.eraTarget&&!state.eraBossSpawned){state.eraBossSpawned=true;let ex=player.x+(Math.random()<.5?-650:650),ey=player.y+(Math.random()<.5?-430:430);ex=Math.max(-WORLD_SIZE/2+120,Math.min(WORLD_SIZE/2-120,ex));ey=Math.max(-WORLD_SIZE/2+120,Math.min(WORLD_SIZE/2-120,ey));let b=applyEraEnemyProfile(new Enemy(ex,ey,4,PIGMENTS.BOSS),true);enemies.push(b);state.activeBoss=b;state.bossDamageSnapshot=state.damageTaken;bossNameEl.innerText=`${cfg.boss} · ${cfg.bossEn}`;bossNameEl.style.color=cfg.accent;bossWarningEl.innerHTML=`<span class="block text-2xl font-serif-tc mb-2" style="color:${cfg.accent}">${cfg.name}的核心作品正在失控</span>WARNING: ${cfg.bossEn} AWAKENED`;bossWarningEl.classList.add('warning-flash');SoundManager.playBossWarning();setTimeout(()=>bossWarningEl.classList.remove('warning-flash'),3000);bossUiEl.classList.remove('hidden');setTimeout(()=>bossUiEl.classList.remove('opacity-0'),100);showEraEvent(`失控巨作《${cfg.boss}》甦醒`,'MASTERPIECE ANOMALY');updateEraProgress();return;}
+ if(enemies.length>=maxEnemies)return;
  if(!state.eraBossSpawned&&Math.random()<(.044+Math.min(state.level,8)*.004+cfg.index*.001)*df.spawn){let ex,ey;if(Math.random()<.5){ex=state.camera.x+(Math.random()<.5?-85:canvas.width+85);ey=state.camera.y+Math.random()*canvas.height;}else{ex=state.camera.x+Math.random()*canvas.width;ey=state.camera.y+(Math.random()<.5?-85:canvas.height+85);}ex=Math.max(-WORLD_SIZE/2+50,Math.min(WORLD_SIZE/2-50,ex));ey=Math.max(-WORLD_SIZE/2+50,Math.min(WORLD_SIZE/2-50,ey));const r=Math.random(),type=r<.4?0:(r<.61?2:(r<.81?3:1));const pTypes=['BLUE','RED','YELLOW','PURPLE','GREEN'];const pigment=PIGMENTS[pTypes[Math.floor(Math.random()*pTypes.length)]];enemies.push(applyEraEnemyProfile(new Enemy(ex,ey,type,pigment)));}}
 
 function addScore(amount) {
@@ -2051,6 +2022,31 @@ function addScore(amount) {
     state.score+=Math.floor(amount*multi*diffCfg().score*(player.stats.scoreMult||1));if(state.score>=15000)unlockAchievement('score15k');
     updateDomCache(uiScore, 'score', state.score);
 }
+
+function resolveEnemyDeath(enemy, indexHint = -1) {
+    if (!enemy || enemy._defeated) return false;
+    enemy._defeated = true;
+    const idx = indexHint >= 0 && enemies[indexHint] === enemy ? indexHint : enemies.indexOf(enemy);
+    const scoreValue = enemy.type === 0 ? 15 : (enemy.type === 1 ? 100 : (enemy.type === 4 ? 500 : 30));
+    addScore(scoreValue);
+    drops.push(new Drop(enemy.x, enemy.y, enemy.type === 0 ? 15 : (enemy.type === 1 ? 60 : (enemy.type === 4 ? 200 : 25))));
+    const coinAmount = enemy.type === 0 ? Math.floor(Math.random()*3)+1 : (enemy.type === 1 ? Math.floor(Math.random()*15)+10 : (enemy.type === 4 ? Math.floor(Math.random()*50)+50 : Math.floor(Math.random()*5)+2));
+    for (let c=0; c<Math.min(10,coinAmount); c++) {
+        coinsList.push(new Coin(enemy.x+(Math.random()-.5)*80, enemy.y+(Math.random()-.5)*80, coinAmount>10 ? Math.ceil(coinAmount/10) : 1));
+    }
+    createParticles(enemy.x,enemy.y,enemy.color,enemy.type===4?30:15,0,360);
+    splatters.push(new Splatter(enemy.x,enemy.y,enemy.color,enemy.type===4?enemy.radius*3:enemy.radius*1.5));
+    if (enemy.type===1 || enemy.type===4) for (let s=0; s<(enemy.type===4?6:2); s++) screenSplatters.push(new ScreenSplatter(enemy.color));
+    applyCameraShake(enemy.type===0?2:(enemy.type===4?25:12));
+    if (enemy.type===1 || enemy.type===4) triggerHitStop(enemy.type===4?15:8);
+    addUltimateCharge(enemy.type===1?10:(enemy.type===4?50:2));
+    SoundManager.playEnemyDie(enemy.type);
+    registerEraKill(enemy);
+    if (idx >= 0 && enemies[idx] === enemy) enemies.splice(idx,1);
+    else { const actual=enemies.indexOf(enemy); if(actual>=0) enemies.splice(actual,1); }
+    return true;
+}
+
 
 function addXp(amount) {
     state.xp+=amount*(player.stats.xpMult||1);
@@ -2110,7 +2106,7 @@ function levelUp() {
     ];
 
     let shuffled = [...RELIC_POOL].sort(() => 0.5 - Math.random());
-    let choices = shuffled.slice(0, 3);
+    let choices = shuffled.slice(0, 4);
     
     upgradeContainer.innerHTML = '';
     choices.forEach((choice) => {
@@ -2146,7 +2142,7 @@ function levelUp() {
 }
 
 function gameOver() {
-    state.gameState = 'GAMEOVER';
+    state.gameState = 'GAMEOVER'; state.ultimateActive=false; state.shopOpen=false; if(artifactIndicator)artifactIndicator.classList.remove('show'); updateStyleLensPanel();
     finalScoreEl.innerText = state.score;
     gameOverScreen.classList.remove('hidden');
     uiLayer.classList.add('hidden');
@@ -2400,14 +2396,8 @@ function gameLoop() {
             }
         }
 
-        if (state.activeBoss) {
-            if (state.activeBoss.hp <= 0) {
-                bossUiEl.classList.add('opacity-0');
-                setTimeout(() => bossUiEl.classList.add('hidden'), 500);
-                state.activeBoss = null;
-            } else {
-                updateDomCache(bossHealthBarEl, 'bossHp', `${Math.max(0, (state.activeBoss.hp / state.activeBoss.maxHp) * 100)}%`, true);
-            }
+        if (state.activeBoss && state.activeBoss.hp > 0) {
+            updateDomCache(bossHealthBarEl, 'bossHp', `${Math.max(0, (state.activeBoss.hp / state.activeBoss.maxHp) * 100)}%`, true);
         }
 
         if (player.stats.orbitals > 0 && doUpdate) {
@@ -2426,13 +2416,7 @@ function gameLoop() {
                     if (enemy.spawnScale >= 1 && checkCollisionFastSq(ox, oy, 8, enemy.x, enemy.y, enemy.radius)) {
                         enemy.hp -= 2 * player.stats.damageMult;
                         createParticles(enemy.x, enemy.y, '#3b82f6', 2, angle, 1);
-                        if (enemy.hp <= 0) {
-                            addScore(enemy.type === 0 ? 15 : (enemy.type === 1 ? 100 : (enemy.type === 4 ? 500 : 30)));
-                            createParticles(enemy.x, enemy.y, enemy.color, 20, 0, 360);
-                            SoundManager.playEnemyDie(enemy.type);
-                            registerEraKill(enemy);
-                            enemies.splice(j, 1);
-                        }
+                        if (enemy.hp <= 0) { resolveEnemyDeath(enemy, j); }
                     }
                 }
             }
@@ -2471,7 +2455,8 @@ function gameLoop() {
         if(doUpdate) spawnEnemy();
 
         for (let i = enemies.length - 1; i >= 0; i--) {
-            let enemy = enemies[i]; 
+            let enemy = enemies[i];
+            if (enemy.hp <= 0) { resolveEnemyDeath(enemy, i); continue; }
             if(doUpdate&&state.freezeTimer<=0)enemy.update(player); 
             enemy.draw();
 
@@ -2543,31 +2528,7 @@ function gameLoop() {
                     if(COMFORT.floatingDamage)damageTexts.push(new DamageText(enemy.x,enemy.y,Math.floor(finalDamage),p.style.color,textType));
                     createParticles(enemy.x, enemy.y, p.style.color, 5, p.isMine ? 0 : Math.atan2(p.vy, p.vx), p.isMine ? 360 : 1);
 
-                    if (enemy.hp <= 0) {
-                        addScore(enemy.type === 0 ? 15 : (enemy.type === 1 ? 100 : (enemy.type === 4 ? 500 : 30)));
-                        
-                        drops.push(new Drop(enemy.x, enemy.y, enemy.type === 0 ? 15 : (enemy.type === 1 ? 60 : (enemy.type === 4 ? 200 : 25))));
-                        
-                        const coinAmount = enemy.type === 0 ? Math.floor(Math.random()*3)+1 : (enemy.type === 1 ? Math.floor(Math.random()*15)+10 : (enemy.type === 4 ? Math.floor(Math.random()*50)+50 : Math.floor(Math.random()*5)+2));
-                        for(let c=0; c<Math.min(10, coinAmount); c++) {
-                           coinsList.push(new Coin(enemy.x + (Math.random()-0.5)*80, enemy.y + (Math.random()-0.5)*80, coinAmount > 10 ? Math.ceil(coinAmount/10) : 1));
-                        }
-
-                        createParticles(enemy.x, enemy.y, enemy.color, enemy.type === 4 ? 30 : 15, 0, 360);
-                        splatters.push(new Splatter(enemy.x, enemy.y, enemy.color, enemy.type === 4 ? enemy.radius * 3 : enemy.radius * 1.5));
-                        
-                        if(enemy.type === 1 || enemy.type === 4) {
-                            for(let s=0; s<(enemy.type===4?6:2); s++) screenSplatters.push(new ScreenSplatter(enemy.color));
-                        }
-
-                        applyCameraShake(enemy.type === 0 ? 2 : (enemy.type === 4 ? 25 : 12));
-                        if (enemy.type === 1 || enemy.type === 4) triggerHitStop(enemy.type === 4 ? 15 : 8); 
-                        addUltimateCharge(enemy.type === 1 ? 10 : (enemy.type === 4 ? 50 : 2)); 
-                        
-                        SoundManager.playEnemyDie(enemy.type);
-                        registerEraKill(enemy);
-                        enemies.splice(j, 1);
-                    }
+                    if (enemy.hp <= 0) { resolveEnemyDeath(enemy, j); }
                     if (p.hitTargets.size > p.pierce && !p.isMine) { hitSomething = true; break; }
                 }
             }
