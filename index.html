@@ -1511,7 +1511,7 @@ function startGame(era = 'PREHISTORIC') {
     state.currentEra=era; state.eraKills=0; state.eraTarget=cfg.target; state.eraBossSpawned=false; state.eraComplete=false;
     state.score=0; state.level=1; state.xp=0; state.xpNeeded=100; state.coins=0;
     state.combo=0;state.comboTimer=0;state.maxComboRun=0;state.maxComboTimer=180;state.usedStyles=new Set([1]);state.hazardTimer=0;state.anomalyCount=0;state.hitStop=0;state.bossSpawnedForLevel=false;state.talentCount=0;state.damageTaken=0;state.bossDamageSnapshot=0;state.skillUses=0;state.ultimateUses=0;state.shopPurchases=0;state.itemCount=0;state.collectedSpecialTypes=new Set();state.specialItemSpawnTimer=300;state.freezeTimer=0;state.restoreInvuln=0;state.skillCooldowns={burst:0,freeze:0,restore:0,rift:0};state.buffTimers={prism:0,mirror:0,muse:0,forbidden:0,magnet:0};
-    state.ultimateGauge=0; state.ultimateActive=false; state.ultimateTimer=0; state.ultimateStyleId=1; state.ultimatePulse=0; state.activeBoss=null; state.cameraShake=0; lastShakeAt=0; state.keys={}; state.mouse.isDown=false; state.runStartTime=Date.now();state.playElapsedMs=0;state.lastActiveTickAt=performance.now();state._skillHudThrottle=0;
+    state.ultimateGauge=0; state.ultimateActive=false; state.ultimateTimer=0; state.ultimateStyleId=1; state.ultimatePulse=0; state.activeBoss=null; state.cameraShake=0; lastShakeAt=0; state.keys={}; state.mouse.isDown=false; state.runStartTime=Date.now();state.playElapsedMs=0;state.lastActiveTickAt=performance.now();state._skillHudThrottle=0;state._lastSimFrameAt=0;
     if(state.endlessMode){state.endlessStartedAt=state.runStartTime;state.endlessBossCount=0;state.endlessLastBossEra=null;state.endlessBossCountdownMs=0;state.endlessHudUpdateAt=0;scheduleNextEndlessBoss(true);}else{state.endlessStartedAt=0;state.endlessBossCount=0;state.endlessNextBossAt=0;state.endlessBossInterval=0;state.endlessBossCountdownMs=0;state.endlessLastBossEra=null;state.endlessHudUpdateAt=0;}
     museumSave.totalRuns=(museumSave.totalRuns||0)+1; persistMuseumSave();
     updateEraHud(); updateEraProgress(); updateCampaignDots();
@@ -2620,7 +2620,7 @@ function updateEraEnemy(e,player){if(e.spawnScale<1){e.spawnScale+=.035;return;}
  else if(e.type===1){e.stateTimer+=slow;if(distSq>85000){e.x+=Math.cos(angle)*e.speed*slow;e.y+=Math.sin(angle)*e.speed*slow;}if(e.stateTimer>140-Math.min(35,cfg.index*4)){const n=3+cfg.index%4;for(let i=0;i<n;i++)enemyProjectiles.push(new EnemyProjectile(e.x,e.y,angle+(i-(n-1)/2)*.2,3.4+cfg.index*.08,e.damage,cfg.palette[i%cfg.palette.length]));e.stateTimer=0;}}
  else if(e.type===2){if(distSq>85000){e.x+=Math.cos(angle)*e.speed*slow;e.y+=Math.sin(angle)*e.speed*slow;}else if(distSq<30000){e.x-=Math.cos(angle)*e.speed*slow;e.y-=Math.sin(angle)*e.speed*slow;}e.stateTimer+=slow;if(e.stateTimer>100-cfg.index*2){enemyProjectiles.push(new EnemyProjectile(e.x,e.y,angle,4.1+cfg.index*.07,e.damage,cfg.accent));e.stateTimer=0;}}
  else if(e.type===3){if(e.isCharging){e.x+=e.chargeDir.x*e.speed*4.6*slow;e.y+=e.chargeDir.y*e.speed*4.6*slow;e.stateTimer-=slow;if(e.stateTimer<=0)e.isCharging=false;}else{e.stateTimer+=slow;if(e.stateTimer>78&&distSq<160000){e.isCharging=true;e.stateTimer=22;e.chargeDir={x:Math.cos(angle),y:Math.sin(angle)};createParticles(e.x,e.y,cfg.accent,7,angle+Math.PI,.7);}else{e.x+=Math.cos(angle)*e.speed*.75*slow;e.y+=Math.sin(angle)*e.speed*.75*slow;}}}
- else if(e.type===4){e.stateTimer+=slow;const hp=e.hp/e.maxHp,speed=e.speed*(hp<.5?1.35:1)*slow;e.x+=Math.cos(angle)*speed;e.y+=Math.sin(angle)*speed;const ringEvery=Math.max(38,70-cfg.index*3);if(Math.floor(e.stateTimer)%ringEvery===0){const n=6+cfg.index;for(let i=0;i<n;i++)enemyProjectiles.push(new EnemyProjectile(e.x,e.y,(i/n)*Math.PI*2+e.stateTimer*.018,4.1+cfg.index*.08,e.damage*.62,cfg.palette[i%cfg.palette.length]));}if(e.stateTimer>190-cfg.index*4){applyCameraShake(12+cfg.index);const n=10+cfg.index;for(let i=0;i<n;i++)enemyProjectiles.push(new EnemyProjectile(e.x,e.y,(i/n)*Math.PI*2,5.3+cfg.index*.08,e.damage*.72,cfg.accent));createParticles(e.x,e.y,cfg.accent,24,0,360);e.stateTimer=0;}}
+ else if(e.type===4){e.stateTimer+=slow;e._ringTimer=(e._ringTimer||0)+slow;const hp=e.hp/e.maxHp,speed=e.speed*(hp<.5?1.35:1)*slow;e.x+=Math.cos(angle)*speed;e.y+=Math.sin(angle)*speed;const ringEvery=Math.max(38,70-cfg.index*3);if(e._ringTimer>=ringEvery){e._ringTimer-=ringEvery;const n=6+cfg.index;for(let i=0;i<n;i++)enemyProjectiles.push(new EnemyProjectile(e.x,e.y,(i/n)*Math.PI*2+e.stateTimer*.018,4.1+cfg.index*.08,e.damage*.62,cfg.palette[i%cfg.palette.length]));}if(e.stateTimer>190-cfg.index*4){applyCameraShake(12+cfg.index);const n=10+cfg.index;for(let i=0;i<n;i++)enemyProjectiles.push(new EnemyProjectile(e.x,e.y,(i/n)*Math.PI*2,5.3+cfg.index*.08,e.damage*.72,cfg.accent));createParticles(e.x,e.y,cfg.accent,24,0,360);e.stateTimer=0;}}
  e.x=Math.max(-WORLD_SIZE/2+e.radius,Math.min(WORLD_SIZE/2-e.radius,e.x));e.y=Math.max(-WORLD_SIZE/2+e.radius,Math.min(WORLD_SIZE/2-e.radius,e.y));}
 Enemy.prototype.draw=function(){drawEraEnemy(this)};
 Enemy.prototype.update=function(player){updateEraEnemy(this,player)};
@@ -2898,7 +2898,7 @@ window.addEventListener('keydown', (e) => {
         if(!state.paused)toggleShop();
         return;
     }
-    if(state.paused)return;
+    if(state.gameState!=='PLAYING'||state.paused)return;
 
     let switched=false;
     if(k==='1'&&player.style!==STYLES.IMPRESSIONISM){player.style=STYLES.IMPRESSIONISM;switched=true;}
@@ -3090,9 +3090,12 @@ if(!state.currentEra||state.eraBossSpawned)return;const cfg=eraCfg();state.anoma
  switch(cfg.hazard){case'TREMOR':applyCameraShake(18);createParticles(cx,cy,cfg.accent,18,0,360);break;case'SHARDS':ring(8,4.2,cfg.accent,8);break;case'GLASS':ring(10,4.5,cfg.palette[state.anomalyCount%4],9,.08);break;case'PERSPECTIVE':for(let i=-4;i<=4;i++)enemyProjectiles.push(new EnemyProjectile(cx+i*85,cy-420,Math.PI/2,4.8,9,cfg.accent));break;case'LIGHTDARK':ring(12,3.8,cfg.accent,10,state.anomalyCount*.2);break;case'WAVE':for(let i=-5;i<=5;i++)enemyProjectiles.push(new EnemyProjectile(cx-520,cy+i*55,0,5.3,9,cfg.accent));break;case'LIGHTDABS':createParticles(cx,cy,cfg.accent,34,0,360);player.heal(3);break;case'GEOMETRY':ring(6,5.2,cfg.palette[state.anomalyCount%4],10,state.anomalyCount*.35);break;case'COMIC':ring(14,4.4,cfg.palette[state.anomalyCount%4],10);applyCameraShake(8);break;case'GLITCH':enemies.forEach((e,i)=>{if(e.type!==4&&i%3===0){e.x+= (Math.random()-.5)*180;e.y+=(Math.random()-.5)*180;}});ring(10,5,cfg.accent,11,state.anomalyCount*.1);break;}}
 function updateEraHazards(){if(state.gameState!=='PLAYING'||state.eraComplete)return;state.hazardTimer++;const interval=Math.max(280,(620-eraCfg().index*24)*diffCfg().hazard);if(state.hazardTimer>=interval){state.hazardTimer=0;triggerEraHazard();}}
 
-function gameLoop() {
+function gameLoop(rafNow=performance.now()) {
     if (!state.running) return;
     requestAnimationFrame(gameLoop);
+    const targetFrameMs=1000/60;
+    if(state._lastSimFrameAt&&rafNow-state._lastSimFrameAt<targetFrameMs*.92)return;
+    state._lastSimFrameAt=rafNow-((rafNow-(state._lastSimFrameAt||rafNow))%targetFrameMs);
     const frameNow=performance.now();
     if(state.paused){state.lastActiveTickAt=frameNow;return;}
     const frameDt=Math.max(0,Math.min(50,frameNow-(state.lastActiveTickAt||frameNow)));
