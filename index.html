@@ -1573,12 +1573,31 @@ function startEndlessMode(){
     showEraEvent('沒有終點。Boss 將從不同藝術年代隨機入侵。','ENDLESS MODE');
 }
 
-function startCampaign(){state.endlessMode=false;state.campaignMode=true; const firstUnfinished=ERA_ORDER.find(id=>!museumSave.completed[id])||'PREHISTORIC'; startGame(firstUnfinished);}
+function startCampaign(){
+    state.endlessMode=false;
+    state.endlessBossCount=0;
+    state.endlessNextBossAt=0;
+    state.endlessBossInterval=0;
+    state.endlessStartedAt=0;
+    state.endlessLastBossEra=null;
+    state.campaignMode=true;
+    startGame('PREHISTORIC');
+}
 function goToLobby(){SoundManager.playUI();state.gameState='LOBBY';state.running=true;state.paused=false;state.campaignMode=false;state.endlessMode=false;['game-over-screen','story-screen','tutorial-screen','era-complete-screen','archive-screen','era-select-screen'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));document.getElementById('lobby-screen').classList.remove('hidden');pauseScreen.classList.add('hidden');uiLayer.classList.add('hidden');shopScreen.classList.add('hidden');campaignProgressEl.classList.add('hidden');bossUiEl.classList.remove('opacity-100');bossUiEl.classList.add('opacity-0');SoundManager.stopAmbientBGM();canvas.classList.remove('ultimate-active-filter');state.currentEra=null;enemies=[];projectiles=[];enemyProjectiles=[];drops=[];coinsList=[];specialItems=[];damageTexts=[];splatters=[];screenSplatters=[];particles=[];state.keys={};state.mouse.isDown=false;state.cameraShake=0;if(artifactIndicator)artifactIndicator.classList.remove('show');updateStyleLensPanel();buildEraCards();}
 function showEraSelect(){SoundManager.init();SoundManager.playUI();document.getElementById('lobby-screen').classList.add('hidden');eraCompleteScreen.classList.add('hidden');eraSelectScreen.classList.remove('hidden');buildEraCards();setDifficulty(state.difficulty);}
 function showEraSelectFromComplete(){state.paused=false;state.gameState='LOBBY';eraCompleteScreen.classList.add('hidden');uiLayer.classList.add('hidden');campaignProgressEl.classList.add('hidden');SoundManager.stopAmbientBGM();eraSelectScreen.classList.remove('hidden');buildEraCards();}
 function hideEraSelect(){SoundManager.playUI();eraSelectScreen.classList.add('hidden');document.getElementById('lobby-screen').classList.remove('hidden');}
-function selectEra(era){state.endlessMode=false;state.campaignMode=false;SoundManager.playUI();startGame(era);}
+function selectEra(era){
+    state.endlessMode=false;
+    state.endlessBossCount=0;
+    state.endlessNextBossAt=0;
+    state.endlessBossInterval=0;
+    state.endlessStartedAt=0;
+    state.endlessLastBossEra=null;
+    state.campaignMode=false;
+    SoundManager.playUI();
+    startGame(era);
+}
 function restartEra(){eraCompleteScreen.classList.add('hidden');if(state.endlessMode)startEndlessMode();else startGame(state.currentEra||'PREHISTORIC');}
 function startNextEra(){const i=ERA_ORDER.indexOf(state.currentEra);if(i>=0&&i<ERA_ORDER.length-1){state.campaignMode=true;eraCompleteScreen.classList.add('hidden');startGame(ERA_ORDER[i+1]);}else{goToLobby();showArchive();}}
 function showChapterToast(){const cfg=eraCfg();chapterEraCode.innerText=cfg.code;chapterEraName.innerText=cfg.name;chapterEraSubtitle.innerText=`${cfg.zone} · ${cfg.period}`;chapterEraCode.style.color=cfg.accent;chapterEraName.style.color=cfg.accent;chapterToast.classList.add('show');setTimeout(()=>chapterToast.classList.remove('show'),2400);}
