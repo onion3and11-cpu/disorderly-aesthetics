@@ -1555,13 +1555,13 @@ function startGame(era = 'PREHISTORIC') {
     state.gameState='PLAYING'; state.running=true; state.paused=false; state.shopOpen=false;
     state.currentEra=era; state.eraKills=0; state.eraTarget=cfg.target; state.eraBossSpawned=false; state.eraComplete=false;
     state.score=0; state.level=1; state.xp=0; state.xpNeeded=100; state.coins=0;
-    state.combo=0;state.comboTimer=0;state.maxComboRun=0;state.maxComboTimer=180;state.usedStyles=new Set([1]);state.hazardTimer=0;state.anomalyCount=0;state.hitStop=0;state.bossSpawnedForLevel=false;state.talentCount=0;state.damageTaken=0;state.bossDamageSnapshot=0;state.skillUses=0;state.ultimateUses=0;state.shopPurchases=0;state.itemCount=0;state.collectedSpecialTypes=new Set();state.specialItemSpawnTimer=300;state.freezeTimer=0;state.restoreInvuln=0;state.skillCooldowns={burst:0,freeze:0,restore:0,rift:0};state.buffTimers={prism:0,mirror:0,muse:0,forbidden:0,magnet:0};
+    state.combo=0;state.comboTimer=0;state.maxComboRun=0;state.maxComboTimer=180;state.usedStyles=new Set([1]);state.hazardTimer=0;state.anomalyCount=0;state.hitStop=0;state.bossSpawnedForLevel=false;state.talentCount=0;state.damageTaken=0;state.bossDamageSnapshot=0;state.skillUses=0;state.ultimateUses=0;state.shopPurchases=0;state.itemCount=0;state.collectedSpecialTypes=new Set();state.specialItemSpawnTimer=300;state.freezeTimer=0;state.restoreInvuln=0;state.skillCooldowns={burst:0,freeze:0,restore:0,rift:0};state.buffTimers={prism:0,mirror:0,muse:0,forbidden:0,magnet:0};state.lastLifestealAt=-9999;
     state.ultimateGauge=0; state.ultimateActive=false; state.ultimateTimer=0; state.ultimateStyleId=1; state.ultimatePulse=0; state.activeBoss=null; state.cameraShake=0; lastShakeAt=0; state.keys={}; state.mouse.isDown=false; state.runStartTime=Date.now();state.playElapsedMs=0;state.lastActiveTickAt=performance.now();state._skillHudThrottle=0;state._lastSimFrameAt=0;
     if(state.endlessMode){state.endlessStartedAt=state.runStartTime;state.endlessBossCount=0;state.endlessLastBossEra=null;state.endlessBossCountdownMs=0;state.endlessHudUpdateAt=0;scheduleNextEndlessBoss(true);}else{state.endlessStartedAt=0;state.endlessBossCount=0;state.endlessNextBossAt=0;state.endlessBossInterval=0;state.endlessBossCountdownMs=0;state.endlessLastBossEra=null;state.endlessHudUpdateAt=0;}
     museumSave.totalRuns=(museumSave.totalRuns||0)+1; persistMuseumSave();
     updateEraHud(); updateEraProgress(); updateCampaignDots();
     uiScore.innerText=state.score;domCache.score=state.score;uiLevel.innerText=state.level;domCache.level=state.level;uiXpBar.style.width='0%';domCache.xp='0%';uiCoinDisplay.innerText=state.coins;domCache.coins=state.coins;uiUltimateBar.style.width='0%';domCache.ult='0%';uiUltimateBar.classList.remove('ultimate-ready');canvas.classList.remove('ultimate-active-filter');comboDisplay.classList.remove('opacity-100');comboDisplay.classList.add('opacity-0');bossUiEl.classList.add('hidden','opacity-0');bossUiEl.classList.remove('opacity-100');bossHealthBarEl.style.width='100%';domCache.bossHp='';bossWarningEl.classList.remove('warning-flash');
-    player.maxHp=diffCfg().playerHp;player.hp=player.maxHp;player.x=0;player.y=0;state.camera.x=player.x-canvas.width/2;state.camera.y=player.y-canvas.height/2;player.stats={damageMult:1,speedMult:1,fireRateMult:1,projSizeMult:1,pierce:0,dashMines:false,surrealEvasion:false,orbitals:0,lifesteal:false,critChance:0,critMult:1.5,bossDamageMult:1,skillCooldownMult:1,killHeal:0,killShield:0,shieldMax:100,regen:0,defenseMult:1,xpMult:1,coinMult:1,scoreMult:1,pickupRadius:0,itemDurationMult:1,itemSpawnRate:1,executeThreshold:0,explosionOnKill:0,ultimateGainMult:1,thorns:0};player.shield=0;player._lastRegen=0;player._lastRegenPlayMs=0;player.history=[];player.lastShot=0;player.isDashing=false;player.dashTimer=0;player.dashCooldown=0;player.maxDashCooldown=60;player.dashDir={x:0,y:0};player.style=STYLES.IMPRESSIONISM;updateUIStyle();updateStyleLensPanel();
+    player.maxHp=diffCfg().playerHp;player.hp=player.maxHp;player.x=0;player.y=0;state.camera.x=player.x-canvas.width/2;state.camera.y=player.y-canvas.height/2;player.stats={damageMult:1,speedMult:1,fireRateMult:1,projSizeMult:1,pierce:0,dashMines:false,dashMineDamage:0,surrealEvasion:false,evasionChance:0,orbitals:0,lifesteal:false,lifestealChance:0,critChance:0,critMult:1.5,bossDamageMult:1,skillCooldownMult:1,killHeal:0,killShield:0,shieldMax:100,regen:0,defenseMult:1,xpMult:1,coinMult:1,scoreMult:1,pickupRadius:0,itemDurationMult:1,itemSpawnRate:1,executeThreshold:0,explosionOnKill:0,ultimateGainMult:1,thorns:0};player.shield=0;player._lastRegen=0;player._lastRegenPlayMs=0;player.history=[];player.lastShot=0;player.isDashing=false;player.dashTimer=0;player.dashCooldown=0;player.maxDashCooldown=60;player.dashDir={x:0,y:0};player.style=STYLES.IMPRESSIONISM;updateUIStyle();updateStyleLensPanel();
     enemies=[];projectiles=[];enemyProjectiles=[];drops=[];damageTexts=[];splatters=[];coinsList=[];screenSplatters=[];specialItems=[];if(artifactIndicator)artifactIndicator.classList.remove('show');renderSkillHud();
     ['lobby-screen','story-screen','tutorial-screen','game-over-screen','archive-screen'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));eraSelectScreen.classList.add('hidden');eraCompleteScreen.classList.add('hidden');shopScreen.classList.add('hidden');pauseScreen.classList.add('hidden');uiLayer.classList.remove('hidden');
     if(state.campaignMode&&!state.endlessMode) campaignProgressEl.classList.remove('hidden'); else campaignProgressEl.classList.add('hidden');
@@ -1933,7 +1933,7 @@ class Player {
     constructor() {
         this.x = 0; this.y = 0; this.radius = 14; this.baseSpeed = 6.4;
         this.maxHp = 100; this.hp = 100; this.style = STYLES.IMPRESSIONISM;
-        this.stats={damageMult:1,speedMult:1,fireRateMult:1,projSizeMult:1,pierce:0,dashMines:false,surrealEvasion:false,orbitals:0,lifesteal:false,critChance:0,critMult:1.5,bossDamageMult:1,skillCooldownMult:1,killHeal:0,killShield:0,shieldMax:100,regen:0,defenseMult:1,xpMult:1,coinMult:1,scoreMult:1,pickupRadius:0,itemDurationMult:1,itemSpawnRate:1,executeThreshold:0,explosionOnKill:0,ultimateGainMult:1,thorns:0};this.shield=0;
+        this.stats={damageMult:1,speedMult:1,fireRateMult:1,projSizeMult:1,pierce:0,dashMines:false,dashMineDamage:0,surrealEvasion:false,evasionChance:0,orbitals:0,lifesteal:false,lifestealChance:0,critChance:0,critMult:1.5,bossDamageMult:1,skillCooldownMult:1,killHeal:0,killShield:0,shieldMax:100,regen:0,defenseMult:1,xpMult:1,coinMult:1,scoreMult:1,pickupRadius:0,itemDurationMult:1,itemSpawnRate:1,executeThreshold:0,explosionOnKill:0,ultimateGainMult:1,thorns:0};this.shield=0;
         this.lastShot = 0; this.history = [];
         this.isDashing = false; this.dashTimer = 0; this.dashDuration = 10; this.dashCooldown = 0;
         this.maxDashCooldown = 60; this.dashDir = {x: 0, y: 0};
@@ -2089,8 +2089,8 @@ class Player {
             this.dashTimer--;
             splatters.push(new Splatter(this.x, this.y, this.style.color, 8));
             
-            if (this.stats.dashMines && this.dashTimer % 3 === 0) {
-                projectiles.push(new Projectile(this.x, this.y, 0, 0, 25*this.stats.damageMult*combatDamageMult(), 12, this.style, 0, 80)); 
+            if (this.stats.dashMineDamage>0 && this.dashTimer % 4 === 0) {
+                projectiles.push(new Projectile(this.x, this.y, 0, 0, this.stats.dashMineDamage*this.stats.damageMult*combatDamageMult(), 12, this.style, 0, 75)); 
             }
             if (this.dashTimer <= 0) this.isDashing = false;
         } else {
@@ -2124,7 +2124,7 @@ class Player {
         const worldMouseX = state.mouse.x + state.camera.x;
         const worldMouseY = state.mouse.y + state.camera.y;
         const angle = Math.atan2(worldMouseY - this.y, worldMouseX - this.x);
-        let rateMult=this.stats.fireRateMult*fireRateBuff();
+        let rateMult=Math.min(2.05,this.stats.fireRateMult||1)*fireRateBuff();
         if (state.combo > 30) rateMult *= 1.15; 
         rateMult *= ultimateFireRateMult(); 
 
@@ -2133,16 +2133,16 @@ class Player {
         if (this.style === STYLES.IMPRESSIONISM) {
             if (now - this.lastShot > 90 / rateMult) {
                 const spread = (Math.random() - 0.5) * (isStyleUltimateActive(1) ? 0.12 : 0.35);
-                projectiles.push(new Projectile(this.x, this.y, angle + spread, 14, 12*this.stats.damageMult*combatDamageMult(), 5 * this.stats.projSizeMult, this.style, pierceAdd));
+                projectiles.push(new Projectile(this.x, this.y, angle + spread, 14, 11*this.stats.damageMult*combatDamageMult(), 5 * this.stats.projSizeMult, this.style, pierceAdd));
                 this.lastShot = now; SoundManager.playShoot(1);
             }
         } else if (this.style === STYLES.FAUVISM) {
             if (now - this.lastShot > 650 / rateMult) {
                 applyCameraShake(6);
-                let pelletes = isStyleUltimateActive(2) ? 5 : 2;
+                let pelletes = isStyleUltimateActive(2) ? 3 : 2;
                 for(let i=-pelletes; i<=pelletes; i++) {
                     const spread = i * 0.25 + (Math.random()-0.5)*0.1;
-                    projectiles.push(new Projectile(this.x, this.y, angle + spread, 10, 40*this.stats.damageMult*combatDamageMult(), 12 * this.stats.projSizeMult, this.style, pierceAdd));
+                    projectiles.push(new Projectile(this.x, this.y, angle + spread, 10, 30*this.stats.damageMult*combatDamageMult(), 12 * this.stats.projSizeMult, this.style, pierceAdd));
                 }
                 this.lastShot = now; this.x -= Math.cos(angle) * 6; this.y -= Math.sin(angle) * 6;
                 createParticles(this.x + Math.cos(angle)*20, this.y + Math.sin(angle)*20, this.style.color, 8, angle, 0.5);
@@ -2151,7 +2151,7 @@ class Player {
         } else if (this.style === STYLES.POPART) {
             if (now - this.lastShot > 450 / rateMult) {
                 applyCameraShake(3);
-                projectiles.push(new PopArtProjectile(this.x, this.y, angle, 10, 50*this.stats.damageMult*combatDamageMult(), this.style, pierceAdd + 3));
+                projectiles.push(new PopArtProjectile(this.x, this.y, angle, 10, 56*this.stats.damageMult*combatDamageMult(), this.style, pierceAdd + 3));
                 if (isStyleUltimateActive(3)) {
                     projectiles.push(new PopArtProjectile(this.x, this.y, angle+0.3, 10, 50*this.stats.damageMult*combatDamageMult(), this.style, pierceAdd + 3));
                     projectiles.push(new PopArtProjectile(this.x, this.y, angle-0.3, 10, 50*this.stats.damageMult*combatDamageMult(), this.style, pierceAdd + 3));
@@ -2161,14 +2161,14 @@ class Player {
         } else if (this.style === STYLES.CUBISM) { 
             if (now - this.lastShot > 800 / rateMult) {
                 applyCameraShake(8);
-                projectiles.push(new CubismProjectile(this.x, this.y, angle, 6, 80*this.stats.damageMult*combatDamageMult(), 20 * this.stats.projSizeMult, this.style, pierceAdd + 10));
+                projectiles.push(new CubismProjectile(this.x, this.y, angle, 6, 90*this.stats.damageMult*combatDamageMult(), 20 * this.stats.projSizeMult, this.style, pierceAdd + 10));
                 this.lastShot = now; this.x -= Math.cos(angle) * 8; this.y -= Math.sin(angle) * 8;
                 SoundManager.playShoot(4);
             }
         } else if (this.style === STYLES.SURREALISM) { 
             if (now - this.lastShot > 250 / rateMult) {
                 applyCameraShake(2);
-                projectiles.push(new SurrealProjectile(this.x, this.y, angle-0.2, 9, 20*this.stats.damageMult*combatDamageMult(), 8 * this.stats.projSizeMult, this.style, pierceAdd));
+                projectiles.push(new SurrealProjectile(this.x, this.y, angle-0.2, 9, 16*this.stats.damageMult*combatDamageMult(), 8 * this.stats.projSizeMult, this.style, pierceAdd));
                 projectiles.push(new SurrealProjectile(this.x, this.y, angle+0.2, 9, 20*this.stats.damageMult*combatDamageMult(), 8 * this.stats.projSizeMult, this.style, pierceAdd));
                 this.lastShot = now; SoundManager.playShoot(5);
             }
@@ -2177,7 +2177,7 @@ class Player {
 
     takeDamage(amount) {
         if(this.isDashing||state.ultimateActive||state.restoreInvuln>0)return;
-        if(this.stats.surrealEvasion && Math.random()<0.15){
+        if((this.stats.evasionChance||0)>0 && Math.random()<Math.min(.22,this.stats.evasionChance)){
             createParticles(this.x,this.y,'#fff',15,0,360);
             if(COMFORT.floatingDamage)damageTexts.push(new DamageText(this.x,this.y-20,'EVADED','#fff',-1));
             return;
@@ -2202,7 +2202,7 @@ class Player {
         
         setTimeout(() => { uiHealthBar.style.backgroundColor = '#ffffff'; uiHealthBar.style.boxShadow = '0 0 8px currentColor'; }, 300);
 
-        if(this.stats.thorns>0){for(const e of enemies)if(Math.hypot(e.x-this.x,e.y-this.y)<150)e.hp=Math.max(1,e.hp-this.stats.thorns);}applyCameraShake(15);triggerHitStop(5);SoundManager.playPlayerHit();
+        if(this.stats.thorns>0){for(const e of enemies)if(Math.hypot(e.x-this.x,e.y-this.y)<150)e.hp-=Math.min(60,this.stats.thorns);}applyCameraShake(15);triggerHitStop(5);SoundManager.playPlayerHit();
         createParticles(this.x, this.y, '#ef4444', 20, 0, 360);
         splatters.push(new Splatter(this.x, this.y, 'rgba(239, 68, 68, 0.5)', 40));
         
@@ -3212,9 +3212,14 @@ function gameLoop(rafNow=performance.now()) {
                 for (let j = enemies.length - 1; j >= 0; j--) {
                     let enemy = enemies[j];
                     if (enemy.spawnScale >= 1 && checkCollisionFastSq(ox, oy, 8, enemy.x, enemy.y, enemy.radius)) {
-                        enemy.hp -= 2 * player.stats.damageMult;
-                        createParticles(enemy.x, enemy.y, '#3b82f6', 2, angle, 1);
-                        if (enemy.hp <= 0) { resolveEnemyDeath(enemy, j); }
+                        enemy._orbitalHitAt=enemy._orbitalHitAt||[];
+                        const last=enemy._orbitalHitAt[i]||-9999;
+                        if(state.playElapsedMs-last>=280){
+                            enemy._orbitalHitAt[i]=state.playElapsedMs;
+                            enemy.hp-=8*player.stats.damageMult;
+                            createParticles(enemy.x,enemy.y,'#3b82f6',2,angle,1);
+                            if(enemy.hp<=0){resolveEnemyDeath(enemy,j);}
+                        }
                     }
                 }
             }
@@ -3314,12 +3319,12 @@ function gameLoop(rafNow=performance.now()) {
                     }
 
                     const bossMult=enemy.type===4?(player.stats.bossDamageMult||1):1;
-                    const isCrit=Math.random()<(0.15+(player.stats.critChance||0));
-                    const critMult=isCrit?(player.stats.critMult||1.5):1;
+                    const isCrit=Math.random()<Math.min(.50,0.15+(player.stats.critChance||0));
+                    const critMult=isCrit?Math.min(2.35,(player.stats.critMult||1.5)):1;
                     const finalDamage=p.damage*damageMulti*bossMult*critMult;
                     enemy.hp-=finalDamage;
                     if(enemy.type!==4&&player.stats.executeThreshold>0&&enemy.hp>0&&enemy.hp/enemy.maxHp<=player.stats.executeThreshold)enemy.hp=0;
-                    if(player.stats.lifesteal&&Math.random()<0.05)player.heal(1);
+                    if((player.stats.lifestealChance||0)>0&&Math.random()<Math.min(.08,player.stats.lifestealChance)&&(state.playElapsedMs-(state.lastLifestealAt||0)>320)){state.lastLifestealAt=state.playElapsedMs;player.heal(1.5);}
                     SoundManager.playEnemyHit(hitTextType);addCombo(hitTextType===1?2:1);
                     if(hitTextType===1){applyCameraShake(8);triggerHitStop(3);createParticles(enemy.x,enemy.y,'#fde047',8,p.isMine?0:Math.atan2(p.vy,p.vx),p.isMine?360:2);}else if(isCrit){applyCameraShake(4);triggerHitStop(2);}
                     
