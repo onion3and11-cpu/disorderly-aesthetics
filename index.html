@@ -739,6 +739,12 @@ body{font-family:'Outfit','Noto Sans TC',system-ui,sans-serif;}
   #style-hud #current-style-name{font-size:25px!important;}
 }
 
+
+/* Endless mode */
+.endless-entry{position:relative!important;background:#171717!important;color:#f3efe5!important;border:1px solid rgba(243,239,229,.22)!important;}
+.endless-entry span{display:inline-grid;place-items:center;width:28px;height:28px;margin-right:10px;border-radius:50%;background:#b91c1c;color:#fff;font-size:20px;line-height:1;}
+.endless-entry:hover{background:#b91c1c!important;color:#fff!important;}
+
 </style>
 </head>
 <body>
@@ -777,6 +783,7 @@ body{font-family:'Outfit','Noto Sans TC',system-ui,sans-serif;}
             </div>
             <div class="flex flex-wrap justify-center gap-4 z-10 w-full px-4 max-w-5xl">
                 <button onclick="startCampaign()" class="btn-elegant px-8 py-4 font-serif-tc font-semibold rounded-sm text-base md:text-lg tracking-[0.2em] uppercase whitespace-nowrap">進入策展任務</button>
+                <button onclick="startEndlessMode()" class="btn-elegant endless-entry px-8 py-4 font-serif-tc font-semibold rounded-sm text-base md:text-lg tracking-[0.2em] uppercase whitespace-nowrap"><span>∞</span> 無盡策展</button>
                 <button onclick="showEraSelect()" class="btn-elegant px-8 py-4 font-serif-tc font-semibold rounded-sm text-base md:text-lg tracking-[0.2em] uppercase whitespace-nowrap">開啟年代索引</button>
                 <button onclick="showArchive()" class="btn-elegant px-8 py-4 font-serif-tc font-semibold rounded-sm text-base md:text-lg tracking-[0.2em] uppercase whitespace-nowrap">館藏資料庫</button>
                 <button onclick="showTutorial()" class="btn-elegant px-8 py-4 font-serif-tc font-semibold rounded-sm text-base md:text-lg tracking-[0.2em] uppercase whitespace-nowrap">操作手冊</button>
@@ -1367,7 +1374,7 @@ const state = {
     shopOpen: false,
     bossSpawnedForLevel: false,
     activeBoss: null,
-    currentEra:null,eraKills:0,eraTarget:30,eraBossSpawned:false,eraComplete:false,campaignMode:false,difficulty:'CURATOR',runStartTime:0,maxComboRun:0,usedStyles:new Set(),hazardTimer:0,anomalyCount:0,talentCount:0,damageTaken:0,bossDamageSnapshot:0,skillUses:0,ultimateUses:0,shopPurchases:0,itemCount:0,collectedSpecialTypes:new Set(),specialItemSpawnTimer:360,freezeTimer:0,restoreInvuln:0,skillCooldowns:{burst:0,freeze:0,restore:0,rift:0},buffTimers:{prism:0,mirror:0,muse:0,forbidden:0,magnet:0}
+    currentEra:null,eraKills:0,eraTarget:30,eraBossSpawned:false,eraComplete:false,campaignMode:false,endlessMode:false,endlessBossCount:0,endlessNextBossAt:0,endlessBossInterval:0,endlessStartedAt:0,endlessLastBossEra:null,difficulty:'CURATOR',runStartTime:0,maxComboRun:0,usedStyles:new Set(),hazardTimer:0,anomalyCount:0,talentCount:0,damageTaken:0,bossDamageSnapshot:0,skillUses:0,ultimateUses:0,shopPurchases:0,itemCount:0,collectedSpecialTypes:new Set(),specialItemSpawnTimer:360,freezeTimer:0,restoreInvuln:0,skillCooldowns:{burst:0,freeze:0,restore:0,rift:0},buffTimers:{prism:0,mirror:0,muse:0,forbidden:0,magnet:0}
 };
 
 
@@ -1489,34 +1496,102 @@ function startGame(era = 'PREHISTORIC') {
     state.currentEra=era; state.eraKills=0; state.eraTarget=cfg.target; state.eraBossSpawned=false; state.eraComplete=false;
     state.score=0; state.level=1; state.xp=0; state.xpNeeded=100; state.coins=0;
     state.combo=0;state.comboTimer=0;state.maxComboRun=0;state.maxComboTimer=180;state.usedStyles=new Set([1]);state.hazardTimer=0;state.anomalyCount=0;state.hitStop=0;state.bossSpawnedForLevel=false;state.talentCount=0;state.damageTaken=0;state.bossDamageSnapshot=0;state.skillUses=0;state.ultimateUses=0;state.shopPurchases=0;state.itemCount=0;state.collectedSpecialTypes=new Set();state.specialItemSpawnTimer=300;state.freezeTimer=0;state.restoreInvuln=0;state.skillCooldowns={burst:0,freeze:0,restore:0,rift:0};state.buffTimers={prism:0,mirror:0,muse:0,forbidden:0,magnet:0};
-    state.ultimateGauge=0; state.ultimateActive=false; state.ultimateTimer=0; state.ultimateStyleId=1; state.ultimatePulse=0; state.activeBoss=null; state.cameraShake=0; lastShakeAt=0; state.keys={}; state.mouse.isDown=false; state.runStartTime=Date.now(); museumSave.totalRuns=(museumSave.totalRuns||0)+1; persistMuseumSave();
+    state.ultimateGauge=0; state.ultimateActive=false; state.ultimateTimer=0; state.ultimateStyleId=1; state.ultimatePulse=0; state.activeBoss=null; state.cameraShake=0; lastShakeAt=0; state.keys={}; state.mouse.isDown=false; state.runStartTime=Date.now();
+    if(state.endlessMode){state.endlessStartedAt=state.runStartTime;state.endlessBossCount=0;state.endlessLastBossEra=null;scheduleNextEndlessBoss(true);}else{state.endlessStartedAt=0;state.endlessBossCount=0;state.endlessNextBossAt=0;state.endlessBossInterval=0;state.endlessLastBossEra=null;}
+    museumSave.totalRuns=(museumSave.totalRuns||0)+1; persistMuseumSave();
     updateEraHud(); updateEraProgress(); updateCampaignDots();
     uiScore.innerText=state.score;domCache.score=state.score;uiLevel.innerText=state.level;domCache.level=state.level;uiXpBar.style.width='0%';domCache.xp='0%';uiCoinDisplay.innerText=state.coins;domCache.coins=state.coins;uiUltimateBar.style.width='0%';domCache.ult='0%';uiUltimateBar.classList.remove('ultimate-ready');canvas.classList.remove('ultimate-active-filter');comboDisplay.classList.remove('opacity-100');comboDisplay.classList.add('opacity-0');bossUiEl.classList.remove('opacity-100');bossUiEl.classList.add('opacity-0');
-    player.maxHp=diffCfg().playerHp;player.hp=player.maxHp;player.x=0;player.y=0;state.camera.x=player.x-canvas.width/2;state.camera.y=player.y-canvas.height/2;player.stats={damageMult:1,speedMult:1,fireRateMult:1,projSizeMult:1,pierce:0,dashMines:false,surrealEvasion:false,orbitals:0,lifesteal:false,critChance:0,critMult:1.5,bossDamageMult:1,skillCooldownMult:1,killHeal:0,killShield:0,shieldMax:100,regen:0,defenseMult:1,xpMult:1,coinMult:1,scoreMult:1,pickupRadius:0,itemDurationMult:1,itemSpawnRate:1,executeThreshold:0,explosionOnKill:0,ultimateGainMult:1,thorns:0};player.shield=0;player._lastRegen=0;player.history=[];player.lastShot=0;player.isDashing=false;player.dashTimer=0;player.dashCooldown=0;player.maxDashCooldown=75;player.dashDir={x:0,y:0};player.style=STYLES.IMPRESSIONISM;updateUIStyle();updateStyleLensPanel();
+    player.maxHp=diffCfg().playerHp;player.hp=player.maxHp;player.x=0;player.y=0;state.camera.x=player.x-canvas.width/2;state.camera.y=player.y-canvas.height/2;player.stats={damageMult:1,speedMult:1,fireRateMult:1,projSizeMult:1,pierce:0,dashMines:false,surrealEvasion:false,orbitals:0,lifesteal:false,critChance:0,critMult:1.5,bossDamageMult:1,skillCooldownMult:1,killHeal:0,killShield:0,shieldMax:100,regen:0,defenseMult:1,xpMult:1,coinMult:1,scoreMult:1,pickupRadius:0,itemDurationMult:1,itemSpawnRate:1,executeThreshold:0,explosionOnKill:0,ultimateGainMult:1,thorns:0};player.shield=0;player._lastRegen=0;player.history=[];player.lastShot=0;player.isDashing=false;player.dashTimer=0;player.dashCooldown=0;player.maxDashCooldown=60;player.dashDir={x:0,y:0};player.style=STYLES.IMPRESSIONISM;updateUIStyle();updateStyleLensPanel();
     enemies=[];projectiles=[];enemyProjectiles=[];drops=[];damageTexts=[];splatters=[];coinsList=[];screenSplatters=[];specialItems=[];if(artifactIndicator)artifactIndicator.classList.remove('show');renderSkillHud();
     ['lobby-screen','story-screen','tutorial-screen','game-over-screen','archive-screen'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));eraSelectScreen.classList.add('hidden');eraCompleteScreen.classList.add('hidden');shopScreen.classList.add('hidden');pauseScreen.classList.add('hidden');uiLayer.classList.remove('hidden');
-    if(state.campaignMode) campaignProgressEl.classList.remove('hidden'); else campaignProgressEl.classList.add('hidden');
+    if(state.campaignMode&&!state.endlessMode) campaignProgressEl.classList.remove('hidden'); else campaignProgressEl.classList.add('hidden');
     uiHealthBar.style.width='100%';domCache.hp='100%';uiHpText.innerText=`${player.maxHp}/${player.maxHp}`;updateUIStyle();SoundManager.startAmbientBGM();showChapterToast();
 }
-function startCampaign(){state.campaignMode=true; const firstUnfinished=ERA_ORDER.find(id=>!museumSave.completed[id])||'PREHISTORIC'; startGame(firstUnfinished);}
-function goToLobby(){SoundManager.playUI();state.gameState='LOBBY';state.running=true;state.paused=false;state.campaignMode=false;['game-over-screen','story-screen','tutorial-screen','era-complete-screen','archive-screen','era-select-screen'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));document.getElementById('lobby-screen').classList.remove('hidden');pauseScreen.classList.add('hidden');uiLayer.classList.add('hidden');shopScreen.classList.add('hidden');campaignProgressEl.classList.add('hidden');bossUiEl.classList.remove('opacity-100');bossUiEl.classList.add('opacity-0');SoundManager.stopAmbientBGM();canvas.classList.remove('ultimate-active-filter');state.currentEra=null;enemies=[];projectiles=[];enemyProjectiles=[];drops=[];coinsList=[];specialItems=[];damageTexts=[];splatters=[];screenSplatters=[];particles=[];state.keys={};state.mouse.isDown=false;state.cameraShake=0;if(artifactIndicator)artifactIndicator.classList.remove('show');updateStyleLensPanel();buildEraCards();}
+
+function scheduleNextEndlessBoss(first=false){
+    if(!state.endlessMode)return;
+    const defeated=state.endlessBossCount||0;
+    const minSec=Math.max(20, first?28:38-defeated*1.15);
+    const maxSec=Math.max(minSec+10, first?46:70-defeated*1.35);
+    const seconds=minSec+Math.random()*(maxSec-minSec);
+    state.endlessBossInterval=Math.round(seconds*1000);
+    state.endlessNextBossAt=Date.now()+state.endlessBossInterval;
+}
+function spawnEndlessBoss(){
+    if(!state.endlessMode||state.activeBoss)return;
+    let pool=ERA_ORDER.filter(id=>id!==state.endlessLastBossEra);
+    if(!pool.length)pool=[...ERA_ORDER];
+    const eraId=pool[Math.floor(Math.random()*pool.length)];
+    const cfg=ERA_CONFIGS[eraId];
+    state.endlessLastBossEra=eraId;
+
+    let ex=player.x+(Math.random()<.5?-720:720),ey=player.y+(Math.random()<.5?-470:470);
+    ex=Math.max(-WORLD_SIZE/2+140,Math.min(WORLD_SIZE/2-140,ex));
+    ey=Math.max(-WORLD_SIZE/2+140,Math.min(WORLD_SIZE/2-140,ey));
+
+    const df=diffCfg();
+    const b=new Enemy(ex,ey,4,PIGMENTS.BOSS);
+    const minutes=Math.max(0,(Date.now()-state.endlessStartedAt)/60000);
+    const pressure=1+(state.endlessBossCount||0)*.20+minutes*.075;
+    b.radius=64+cfg.index*2;
+    b.speed=(.58+cfg.index*.015)*Math.min(1.75,1+minutes*.025+(state.endlessBossCount||0)*.018);
+    b.maxHp=Math.round((1450+cfg.index*250)*df.enemyHp*pressure);
+    b.hp=b.maxHp;
+    b.damage=(24+cfg.index*1.8)*df.enemyDmg*Math.min(2.7,1+(state.endlessBossCount||0)*.07+minutes*.035);
+    b.vertices=10+cfg.index%4;
+    b.color=cfg.accent;
+    b.eraId=eraId;
+    b.endlessBoss=true;
+    b.endlessNumber=(state.endlessBossCount||0)+1;
+    enemies.push(b);
+    state.activeBoss=b;
+    state.bossDamageSnapshot=state.damageTaken;
+
+    bossNameEl.innerText=`∞ #${b.endlessNumber} · ${cfg.boss} · ${cfg.bossEn}`;
+    bossNameEl.style.color=cfg.accent;
+    bossHealthBarEl.style.width='100%';
+    bossWarningEl.innerHTML=`<span class="block text-2xl font-serif-tc mb-2" style="color:${cfg.accent}">無盡展廳遭到「${cfg.name}」入侵</span>WARNING: ${cfg.bossEn} ENTERED THE ARCHIVE`;
+    bossWarningEl.classList.add('warning-flash');
+    SoundManager.playBossWarning();
+    setTimeout(()=>bossWarningEl.classList.remove('warning-flash'),3000);
+    bossUiEl.classList.remove('hidden');
+    setTimeout(()=>bossUiEl.classList.remove('opacity-0'),100);
+    showEraEvent(`Boss #${b.endlessNumber}《${cfg.boss}》出現`,'ENDLESS BOSS');
+    updateEraProgress();
+}
+function updateEndlessMode(){
+    if(!state.endlessMode||state.gameState!=='PLAYING')return;
+    if(!state.activeBoss&&state.endlessNextBossAt>0&&Date.now()>=state.endlessNextBossAt){
+        spawnEndlessBoss();
+    }
+    updateEraProgress();
+}
+function startEndlessMode(){
+    state.campaignMode=false;
+    state.endlessMode=true;
+    startGame('DIGITAL');
+    showEraEvent('沒有終點。Boss 將從不同藝術年代隨機入侵。','ENDLESS MODE');
+}
+
+function startCampaign(){state.endlessMode=false;state.campaignMode=true; const firstUnfinished=ERA_ORDER.find(id=>!museumSave.completed[id])||'PREHISTORIC'; startGame(firstUnfinished);}
+function goToLobby(){SoundManager.playUI();state.gameState='LOBBY';state.running=true;state.paused=false;state.campaignMode=false;state.endlessMode=false;['game-over-screen','story-screen','tutorial-screen','era-complete-screen','archive-screen','era-select-screen'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));document.getElementById('lobby-screen').classList.remove('hidden');pauseScreen.classList.add('hidden');uiLayer.classList.add('hidden');shopScreen.classList.add('hidden');campaignProgressEl.classList.add('hidden');bossUiEl.classList.remove('opacity-100');bossUiEl.classList.add('opacity-0');SoundManager.stopAmbientBGM();canvas.classList.remove('ultimate-active-filter');state.currentEra=null;enemies=[];projectiles=[];enemyProjectiles=[];drops=[];coinsList=[];specialItems=[];damageTexts=[];splatters=[];screenSplatters=[];particles=[];state.keys={};state.mouse.isDown=false;state.cameraShake=0;if(artifactIndicator)artifactIndicator.classList.remove('show');updateStyleLensPanel();buildEraCards();}
 function showEraSelect(){SoundManager.init();SoundManager.playUI();document.getElementById('lobby-screen').classList.add('hidden');eraCompleteScreen.classList.add('hidden');eraSelectScreen.classList.remove('hidden');buildEraCards();setDifficulty(state.difficulty);}
 function showEraSelectFromComplete(){state.paused=false;state.gameState='LOBBY';eraCompleteScreen.classList.add('hidden');uiLayer.classList.add('hidden');campaignProgressEl.classList.add('hidden');SoundManager.stopAmbientBGM();eraSelectScreen.classList.remove('hidden');buildEraCards();}
 function hideEraSelect(){SoundManager.playUI();eraSelectScreen.classList.add('hidden');document.getElementById('lobby-screen').classList.remove('hidden');}
-function selectEra(era){state.campaignMode=false;SoundManager.playUI();startGame(era);}
-function restartEra(){eraCompleteScreen.classList.add('hidden');startGame(state.currentEra||'PREHISTORIC');}
+function selectEra(era){state.endlessMode=false;state.campaignMode=false;SoundManager.playUI();startGame(era);}
+function restartEra(){eraCompleteScreen.classList.add('hidden');if(state.endlessMode)startEndlessMode();else startGame(state.currentEra||'PREHISTORIC');}
 function startNextEra(){const i=ERA_ORDER.indexOf(state.currentEra);if(i>=0&&i<ERA_ORDER.length-1){state.campaignMode=true;eraCompleteScreen.classList.add('hidden');startGame(ERA_ORDER[i+1]);}else{goToLobby();showArchive();}}
 function showChapterToast(){const cfg=eraCfg();chapterEraCode.innerText=cfg.code;chapterEraName.innerText=cfg.name;chapterEraSubtitle.innerText=`${cfg.zone} · ${cfg.period}`;chapterEraCode.style.color=cfg.accent;chapterEraName.style.color=cfg.accent;chapterToast.classList.add('show');setTimeout(()=>chapterToast.classList.remove('show'),2400);}
-function updateEraHud(){const cfg=eraCfg();if(eraCodeEl){eraCodeEl.innerText=cfg.code;eraCodeEl.style.color=cfg.accent;}if(eraNameEl){eraNameEl.innerText=`${cfg.name} · ${cfg.zone}`;eraNameEl.style.color=cfg.accent;}if(eraMechanicTextEl)eraMechanicTextEl.innerText=cfg.mechanic;const dh=document.getElementById('difficulty-hud');if(dh)dh.innerText=state.difficulty;eraProgressFill.style.background=cfg.accent;}
-function updateEraProgress(){if(!eraProgressText||!eraProgressFill)return;const cfg=eraCfg(),shown=Math.min(state.eraKills,state.eraTarget);if(state.eraBossSpawned&&state.activeBoss){eraProgressText.innerText=`BOSS · ${cfg.boss}`;eraProgressFill.style.width='100%';}else{eraProgressText.innerText=`修復 ${shown} / ${state.eraTarget}`;eraProgressFill.style.width=`${Math.min(100,shown/state.eraTarget*100)}%`;}}
+function updateEraHud(){const cfg=eraCfg();if(state.endlessMode){if(eraCodeEl){eraCodeEl.innerText='∞ ENDLESS';eraCodeEl.style.color='#b91c1c';}if(eraNameEl){eraNameEl.innerText='無盡策展 · 失序收藏庫';eraNameEl.style.color='#171717';}if(eraMechanicTextEl)eraMechanicTextEl.innerText='無時間限制 · 隨機年代 Boss 會持續入侵';const dh=document.getElementById('difficulty-hud');if(dh)dh.innerText=`ENDLESS · ${state.difficulty}`;eraProgressFill.style.background='#b91c1c';return;}if(eraCodeEl){eraCodeEl.innerText=cfg.code;eraCodeEl.style.color=cfg.accent;}if(eraNameEl){eraNameEl.innerText=`${cfg.name} · ${cfg.zone}`;eraNameEl.style.color=cfg.accent;}if(eraMechanicTextEl)eraMechanicTextEl.innerText=cfg.mechanic;const dh=document.getElementById('difficulty-hud');if(dh)dh.innerText=state.difficulty;eraProgressFill.style.background=cfg.accent;}
+function updateEraProgress(){if(!eraProgressText||!eraProgressFill)return;if(state.endlessMode){if(state.activeBoss){const bc=ERA_CONFIGS[state.activeBoss.eraId]||eraCfg();eraProgressText.innerText=`BOSS #${state.activeBoss.endlessNumber||state.endlessBossCount+1} · ${bc.boss}`;eraProgressFill.style.width='100%';}else{const remain=Math.max(0,state.endlessNextBossAt-Date.now());const total=Math.max(1,state.endlessBossInterval||remain||1);const pct=Math.max(0,Math.min(100,100-remain/total*100));eraProgressText.innerText=`已擊敗 ${state.endlessBossCount} · 下一次異常約 ${Math.ceil(remain/1000)} 秒`;eraProgressFill.style.width=`${pct}%`;}return;}const cfg=eraCfg(),shown=Math.min(state.eraKills,state.eraTarget);if(state.eraBossSpawned&&state.activeBoss){eraProgressText.innerText=`BOSS · ${cfg.boss}`;eraProgressFill.style.width='100%';}else{eraProgressText.innerText=`修復 ${shown} / ${state.eraTarget}`;eraProgressFill.style.width=`${Math.min(100,shown/state.eraTarget*100)}%`;}}
 function registerEraKill(enemy){
  if(!state.currentEra||state.eraComplete)return;museumSave.totalKills=(museumSave.totalKills||0)+1;if(museumSave.totalKills===1)unlockAchievement('first');
  if(player.stats.killHeal>0)player.heal(player.stats.killHeal);if(player.stats.killShield>0)player.shield=Math.min(player.stats.shieldMax||100,player.shield+player.stats.killShield);
  if(player.stats.explosionOnKill>0){for(const e of enemies){if(e!==enemy&&Math.hypot(e.x-enemy.x,e.y-enemy.y)<125)e.hp=Math.max(1,e.hp-player.stats.explosionOnKill*player.stats.damageMult);}createParticles(enemy.x,enemy.y,'#f59e0b',12,0,360);}
- if(enemy.type===4){state.eraComplete=true;state.activeBoss=null;museumSave.totalBosses=(museumSave.totalBosses||0)+1;unlockAchievement('boss1');if(museumSave.totalBosses>=5)unlockAchievement('boss5');if(museumSave.totalBosses>=10)unlockAchievement('boss10');if(state.damageTaken<=state.bossDamageSnapshot)unlockAchievement('perfectboss');bossUiEl.classList.add('opacity-0');setTimeout(()=>bossUiEl.classList.add('hidden'),350);setTimeout(()=>finishEra(),650);}else{state.eraKills++;updateEraProgress();}
+ if(enemy.type===4){museumSave.totalBosses=(museumSave.totalBosses||0)+1;unlockAchievement('boss1');if(museumSave.totalBosses>=5)unlockAchievement('boss5');if(museumSave.totalBosses>=10)unlockAchievement('boss10');if(state.damageTaken<=state.bossDamageSnapshot)unlockAchievement('perfectboss');state.activeBoss=null;bossUiEl.classList.add('opacity-0');setTimeout(()=>bossUiEl.classList.add('hidden'),350);if(state.endlessMode){state.endlessBossCount++;state.eraKills++;const bossEra=ERA_CONFIGS[enemy.eraId]||eraCfg();addScore(750+state.endlessBossCount*125);showEraEvent(`Boss #${state.endlessBossCount}《${bossEra.boss}》已封印，下一個異常正在形成`,'ENDLESS CLEAR');scheduleNextEndlessBoss(false);updateEraProgress();}else{state.eraComplete=true;setTimeout(()=>finishEra(),650);}}else{state.eraKills++;updateEraProgress();}
  persistMuseumSave();
 }
-function finishEra(){const cfg=eraCfg(),elapsed=Date.now()-state.runStartTime;state.paused=true;SoundManager.stopAmbientBGM();museumSave.completed[state.currentEra]=true;museumSave.bestScores[state.currentEra]=Math.max(museumSave.bestScores[state.currentEra]||0,state.score);const old=museumSave.bestTimes[state.currentEra];if(!old||elapsed<old)museumSave.bestTimes[state.currentEra]=elapsed;const completedCount=Object.keys(museumSave.completed).filter(k=>museumSave.completed[k]).length;if(completedCount>=5)unlockAchievement('five');if(completedCount>=ERA_ORDER.length)unlockAchievement('all');if(state.campaignMode&&state.currentEra==='DIGITAL')unlockAchievement('campaign');if(state.difficulty==='MASTERPIECE')unlockAchievement('masterpiece');if(elapsed<=240000)unlockAchievement('speedrun');if(state.damageTaken<=0)unlockAchievement('untouched');persistMuseumSave();document.getElementById('era-final-score').innerText=state.score;document.getElementById('era-final-kills').innerText=state.eraKills;document.getElementById('era-final-combo').innerText=state.maxComboRun;document.getElementById('era-final-time').innerText=formatTime(elapsed);document.getElementById('era-complete-title').innerText=`${cfg.name} · 修復完成`;document.getElementById('era-complete-desc').innerHTML=`《${cfg.boss}》已重新封印。<br>${cfg.bossDesc}`;const idx=ERA_ORDER.indexOf(state.currentEra);const next=document.getElementById('next-era-btn');next.innerText=idx<ERA_ORDER.length-1?'下一時代':'查看完整館藏';eraCompleteScreen.classList.remove('hidden');SoundManager.playLevelUp();buildEraCards();}
+function finishEra(){if(state.endlessMode)return;const cfg=eraCfg(),elapsed=Date.now()-state.runStartTime;state.paused=true;SoundManager.stopAmbientBGM();museumSave.completed[state.currentEra]=true;museumSave.bestScores[state.currentEra]=Math.max(museumSave.bestScores[state.currentEra]||0,state.score);const old=museumSave.bestTimes[state.currentEra];if(!old||elapsed<old)museumSave.bestTimes[state.currentEra]=elapsed;const completedCount=Object.keys(museumSave.completed).filter(k=>museumSave.completed[k]).length;if(completedCount>=5)unlockAchievement('five');if(completedCount>=ERA_ORDER.length)unlockAchievement('all');if(state.campaignMode&&state.currentEra==='DIGITAL')unlockAchievement('campaign');if(state.difficulty==='MASTERPIECE')unlockAchievement('masterpiece');if(elapsed<=240000)unlockAchievement('speedrun');if(state.damageTaken<=0)unlockAchievement('untouched');persistMuseumSave();document.getElementById('era-final-score').innerText=state.score;document.getElementById('era-final-kills').innerText=state.eraKills;document.getElementById('era-final-combo').innerText=state.maxComboRun;document.getElementById('era-final-time').innerText=formatTime(elapsed);document.getElementById('era-complete-title').innerText=`${cfg.name} · 修復完成`;document.getElementById('era-complete-desc').innerHTML=`《${cfg.boss}》已重新封印。<br>${cfg.bossDesc}`;const idx=ERA_ORDER.indexOf(state.currentEra);const next=document.getElementById('next-era-btn');next.innerText=idx<ERA_ORDER.length-1?'下一時代':'查看完整館藏';eraCompleteScreen.classList.remove('hidden');SoundManager.playLevelUp();buildEraCards();}
 function updateCampaignDots(){if(!campaignDotsEl)return;campaignDotsEl.innerHTML='';ERA_ORDER.forEach(id=>{const dot=document.createElement('span');dot.className='mini-dot'+(museumSave.completed[id]?' done':'')+(state.currentEra===id?' current':'');dot.title=ERA_CONFIGS[id].name;campaignDotsEl.appendChild(dot);});}
 let eraEventHideTimer=null;function showEraEvent(text,kicker='ERA ANOMALY'){const t=document.getElementById('era-event-text'),k=document.getElementById('era-event-kicker');if(t)t.innerText=text;if(k)k.innerText=kicker;if(!eraEventToast)return;eraEventToast.classList.add('show');if(eraEventHideTimer)clearTimeout(eraEventHideTimer);eraEventHideTimer=setTimeout(()=>eraEventToast.classList.remove('show'),2300);}
 function updateArtifactIndicator(){
@@ -1769,12 +1844,12 @@ class Splatter {
 
 class Player {
     constructor() {
-        this.x = 0; this.y = 0; this.radius = 14; this.baseSpeed = 5;
+        this.x = 0; this.y = 0; this.radius = 14; this.baseSpeed = 6.4;
         this.maxHp = 100; this.hp = 100; this.style = STYLES.IMPRESSIONISM;
         this.stats={damageMult:1,speedMult:1,fireRateMult:1,projSizeMult:1,pierce:0,dashMines:false,surrealEvasion:false,orbitals:0,lifesteal:false,critChance:0,critMult:1.5,bossDamageMult:1,skillCooldownMult:1,killHeal:0,killShield:0,shieldMax:100,regen:0,defenseMult:1,xpMult:1,coinMult:1,scoreMult:1,pickupRadius:0,itemDurationMult:1,itemSpawnRate:1,executeThreshold:0,explosionOnKill:0,ultimateGainMult:1,thorns:0};this.shield=0;
         this.lastShot = 0; this.history = [];
-        this.isDashing = false; this.dashTimer = 0; this.dashDuration = 12; this.dashCooldown = 0;
-        this.maxDashCooldown = 75; this.dashDir = {x: 0, y: 0};
+        this.isDashing = false; this.dashTimer = 0; this.dashDuration = 10; this.dashCooldown = 0;
+        this.maxDashCooldown = 60; this.dashDir = {x: 0, y: 0};
     }
 
     draw() {
@@ -1922,7 +1997,7 @@ class Player {
         speed *= ultimateMoveMult(); 
 
         if (this.isDashing) {
-            speed *= 3.5; 
+            speed *= 4.1; 
             this.x += this.dashDir.x * speed; this.y += this.dashDir.y * speed;
             this.dashTimer--;
             splatters.push(new Splatter(this.x, this.y, this.style.color, 8));
@@ -2611,6 +2686,7 @@ function createParticles(x, y, color, count, baseAngle, spread) {
 }
 
 function spawnEnemy(){const cfg=eraCfg(),df=diffCfg();const maxEnemies=Math.round((16+Math.min(state.level*3,28)+Math.floor(cfg.index/2))*df.spawn);
+ if(state.endlessMode){const minutes=Math.max(0,(Date.now()-state.endlessStartedAt)/60000);const endlessMax=Math.round((20+Math.min(state.level*3,34)+Math.min(26,minutes*2.2))*df.spawn);if(enemies.length>=endlessMax)return;if(Math.random()<(.05+Math.min(state.level,10)*.004+Math.min(.045,minutes*.0025))*df.spawn){let ex,ey;if(Math.random()<.5){ex=state.camera.x+(Math.random()<.5?-90:canvas.width+90);ey=state.camera.y+Math.random()*canvas.height;}else{ex=state.camera.x+Math.random()*canvas.width;ey=state.camera.y+(Math.random()<.5?-90:canvas.height+90);}ex=Math.max(-WORLD_SIZE/2+50,Math.min(WORLD_SIZE/2-50,ex));ey=Math.max(-WORLD_SIZE/2+50,Math.min(WORLD_SIZE/2-50,ey));const r=Math.random(),type=r<.38?0:(r<.60?2:(r<.82?3:1));const pTypes=['BLUE','RED','YELLOW','PURPLE','GREEN'];const pigment=PIGMENTS[pTypes[Math.floor(Math.random()*pTypes.length)]];const e=applyEraEnemyProfile(new Enemy(ex,ey,type,pigment));const pressure=1+Math.min(1.5,minutes*.035+(state.endlessBossCount||0)*.025);e.maxHp=Math.round(e.maxHp*pressure);e.hp=e.maxHp;e.damage*=Math.min(2.3,1+minutes*.02+(state.endlessBossCount||0)*.018);enemies.push(e);}return;}
  if(state.eraKills>=state.eraTarget&&!state.eraBossSpawned){state.eraBossSpawned=true;let ex=player.x+(Math.random()<.5?-650:650),ey=player.y+(Math.random()<.5?-430:430);ex=Math.max(-WORLD_SIZE/2+120,Math.min(WORLD_SIZE/2-120,ex));ey=Math.max(-WORLD_SIZE/2+120,Math.min(WORLD_SIZE/2-120,ey));let b=applyEraEnemyProfile(new Enemy(ex,ey,4,PIGMENTS.BOSS),true);enemies.push(b);state.activeBoss=b;state.bossDamageSnapshot=state.damageTaken;bossNameEl.innerText=`${cfg.boss} · ${cfg.bossEn}`;bossNameEl.style.color=cfg.accent;bossWarningEl.innerHTML=`<span class="block text-2xl font-serif-tc mb-2" style="color:${cfg.accent}">${cfg.name}的核心作品正在失控</span>WARNING: ${cfg.bossEn} AWAKENED`;bossWarningEl.classList.add('warning-flash');SoundManager.playBossWarning();setTimeout(()=>bossWarningEl.classList.remove('warning-flash'),3000);bossUiEl.classList.remove('hidden');setTimeout(()=>bossUiEl.classList.remove('opacity-0'),100);showEraEvent(`失控巨作《${cfg.boss}》甦醒`,'MASTERPIECE ANOMALY');updateEraProgress();return;}
  if(enemies.length>=maxEnemies)return;
  if(!state.eraBossSpawned&&Math.random()<(.044+Math.min(state.level,8)*.004+cfg.index*.001)*df.spawn){let ex,ey;if(Math.random()<.5){ex=state.camera.x+(Math.random()<.5?-85:canvas.width+85);ey=state.camera.y+Math.random()*canvas.height;}else{ex=state.camera.x+Math.random()*canvas.width;ey=state.camera.y+(Math.random()<.5?-85:canvas.height+85);}ex=Math.max(-WORLD_SIZE/2+50,Math.min(WORLD_SIZE/2-50,ex));ey=Math.max(-WORLD_SIZE/2+50,Math.min(WORLD_SIZE/2-50,ey));const r=Math.random(),type=r<.4?0:(r<.61?2:(r<.81?3:1));const pTypes=['BLUE','RED','YELLOW','PURPLE','GREEN'];const pigment=PIGMENTS[pTypes[Math.floor(Math.random()*pTypes.length)]];enemies.push(applyEraEnemyProfile(new Enemy(ex,ey,type,pigment)));}}
@@ -2740,6 +2816,7 @@ function levelUp() {
 }
 
 function gameOver() {
+    if(state.endlessMode){const survived=Math.max(0,Date.now()-state.endlessStartedAt);museumSave.bestEndlessScore=Math.max(museumSave.bestEndlessScore||0,state.score);museumSave.bestEndlessTime=Math.max(museumSave.bestEndlessTime||0,survived);museumSave.bestEndlessBosses=Math.max(museumSave.bestEndlessBosses||0,state.endlessBossCount||0);persistMuseumSave();}
     state.gameState = 'GAMEOVER'; state.ultimateActive=false; state.shopOpen=false; if(artifactIndicator)artifactIndicator.classList.remove('show'); updateStyleLensPanel();
     finalScoreEl.innerText = state.score;
     gameOverScreen.classList.remove('hidden');
@@ -2948,8 +3025,8 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
     if (state.paused) return;
 
-    state.camera.x += (player.x - canvas.width / 2 - state.camera.x) * 0.08;
-    state.camera.y += (player.y - canvas.height / 2 - state.camera.y) * 0.08;
+    state.camera.x += (player.x - canvas.width / 2 - state.camera.x) * 0.22;
+    state.camera.y += (player.y - canvas.height / 2 - state.camera.y) * 0.22;
 
     if (state.ultimateActive) {
         state.ultimateTimer--;updateUltimateEffect();
@@ -2984,7 +3061,7 @@ function gameLoop() {
     if (!doUpdate) state.hitStop--;
 
     if (state.gameState === 'PLAYING') {
-        if(doUpdate) updateEraHazards();
+        if(doUpdate){updateEraHazards();updateEndlessMode();}
         
         if (doUpdate && state.combo > 0) {
             state.comboTimer--;
@@ -3050,7 +3127,7 @@ function gameLoop() {
 
         for(let i=specialItems.length-1;i>=0;i--){const it=specialItems[i];if(doUpdate)it.update();it.draw();if(checkCollisionFastSq(player.x,player.y,player.radius+getPickupBonus(),it.x,it.y,it.radius)){collectSpecialItem(it);specialItems.splice(i,1);}else if(it.life<=0)specialItems.splice(i,1);}
         if(doUpdate)updateActiveSystems();
-        if(doUpdate) player.update(); 
+        player.update(); 
         player.draw();
         if(doUpdate) spawnEnemy();
 
