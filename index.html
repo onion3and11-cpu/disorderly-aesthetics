@@ -1462,64 +1462,64 @@ let projectiles = []; let enemyProjectiles = []; let enemies = [];
 let particles = []; let splatters = []; let damageTexts = []; let drops = []; let coinsList = [];
 let screenSplatters = []; let specialItems = []; 
 
-const DIFFICULTIES={GALLERY:{label:'GALLERY',enemyHp:.78,enemyDmg:.72,spawn:.86,hazard:1.35,score:.85,playerHp:125},CURATOR:{label:'CURATOR',enemyHp:1,enemyDmg:1,spawn:1,hazard:1,score:1,playerHp:100},MASTERPIECE:{label:'MASTERPIECE',enemyHp:1.35,enemyDmg:1.3,spawn:1.18,hazard:.78,score:1.35,playerHp:90}};
+const DIFFICULTIES={GALLERY:{label:'GALLERY',enemyHp:.84,enemyDmg:.78,spawn:.90,hazard:1.25,score:.88,playerHp:120},CURATOR:{label:'CURATOR',enemyHp:1,enemyDmg:1,spawn:1,hazard:1,score:1,playerHp:100},MASTERPIECE:{label:'MASTERPIECE',enemyHp:1.28,enemyDmg:1.22,spawn:1.12,hazard:.82,score:1.30,playerHp:95}};
 function diffCfg(){return DIFFICULTIES[state.difficulty]||DIFFICULTIES.CURATOR;}
 const ACTIVE_SKILLS={
- burst:{name:'色彩爆裂',key:'E',cd:8},freeze:{name:'凝時畫框',key:'R',cd:18},restore:{name:'修復領域',key:'F',cd:25},rift:{name:'時代裂隙',key:'C',cd:12}
+ burst:{name:'色彩爆裂',key:'E',cd:9},freeze:{name:'凝時畫框',key:'R',cd:20},restore:{name:'修復領域',key:'F',cd:28},rift:{name:'時代裂隙',key:'C',cd:13}
 };
 const SPECIAL_ITEMS=[
- {id:'RESTORE',name:'修復之果',icon:'✚',color:'#34d399',desc:'立即恢復 35 HP'},
- {id:'FRAME',name:'鎏金畫框',icon:'▣',color:'#fbbf24',desc:'獲得 50 點護盾'},
- {id:'PRISM',name:'稜鏡顏料',icon:'◇',color:'#67e8f9',desc:'15 秒傷害 +50%、額外穿透'},
- {id:'MIRROR',name:'鏡像畫布',icon:'◫',color:'#c084fc',desc:'15 秒攻速大幅提升'},
- {id:'MUSE',name:'繆思羽毛',icon:'✦',color:'#f9a8d4',desc:'15 秒高速移動'},
- {id:'HOURGLASS',name:'時間碎片',icon:'⌛',color:'#93c5fd',desc:'凍結敵人與敵方彈幕 5 秒'},
- {id:'MAGNET',name:'收藏磁鐵',icon:'∩',color:'#fde047',desc:'18 秒超大拾取範圍、金幣加倍'},
- {id:'SIGNATURE',name:'大師簽名',icon:'✎',color:'#ffffff',desc:'大絕充滿並削減所有技能冷卻'},
- {id:'FORBIDDEN',name:'禁色顏料',icon:'◆',color:'#ef4444',desc:'10 秒傷害翻倍，但立刻失去 10 HP'}
+ {id:'RESTORE',name:'修復之果',icon:'✚',color:'#34d399',desc:'立即恢復 30 HP'},
+ {id:'FRAME',name:'鎏金畫框',icon:'▣',color:'#fbbf24',desc:'獲得 40 點護盾'},
+ {id:'PRISM',name:'稜鏡顏料',icon:'◇',color:'#67e8f9',desc:'12 秒傷害 +35%、額外穿透 +1'},
+ {id:'MIRROR',name:'鏡像畫布',icon:'◫',color:'#c084fc',desc:'12 秒攻速 +45%'},
+ {id:'MUSE',name:'繆思羽毛',icon:'✦',color:'#f9a8d4',desc:'12 秒移速 +35%'},
+ {id:'HOURGLASS',name:'時間碎片',icon:'⌛',color:'#93c5fd',desc:'凍結敵人與敵方彈幕 3 秒'},
+ {id:'MAGNET',name:'收藏磁鐵',icon:'∩',color:'#fde047',desc:'15 秒超大拾取範圍、金幣 +50%'},
+ {id:'SIGNATURE',name:'大師簽名',icon:'✎',color:'#ffffff',desc:'大絕充滿並削減 30% 剩餘技能冷卻'},
+ {id:'FORBIDDEN',name:'禁色顏料',icon:'◆',color:'#ef4444',desc:'8 秒傷害 +60%，立即失去約 12% 最大 HP'}
 ];
 const STYLE_ULTIMATES={
- 1:{name:'瞬光連作',en:'LUMINOUS IMPRESSION',duration:420,desc:'高速筆觸與光點環射；敵人明顯減速。'},
- 2:{name:'赤狂爆發',en:'FERAL ERUPTION',duration:240,desc:'短時間高傷害、近距離衝擊與狂野扇射。'},
- 3:{name:'大眾複製',en:'MASS REPRODUCTION',duration:300,desc:'漫畫文字大量複製，持續全向爆字。'},
- 4:{name:'碎維封鎖',en:'FRACTURED DIMENSION',duration:360,desc:'幾何穿透彈封鎖空間，敵人近乎停滯。'},
- 5:{name:'夢境潮汐',en:'DREAM TIDE',duration:420,desc:'追蹤流體持續湧出，回復生命並扭曲彈幕。'}
+ 1:{name:'瞬光連作',en:'LUMINOUS IMPRESSION',duration:360,desc:'高速筆觸與光點環射；偏向機動與持續輸出。'},
+ 2:{name:'赤狂爆發',en:'FERAL ERUPTION',duration:210,desc:'極短時間近距離爆發，風險高但火力最高。'},
+ 3:{name:'大眾複製',en:'MASS REPRODUCTION',duration:300,desc:'漫畫文字大量複製，擅長清場與多目標穿透。'},
+ 4:{name:'碎維封鎖',en:'FRACTURED DIMENSION',duration:330,desc:'幾何穿透彈封鎖空間，以控制與穿透取勝。'},
+ 5:{name:'夢境潮汐',en:'DREAM TIDE',duration:360,desc:'追蹤流體持續湧出，兼具續航與自動追擊。'}
 };
 const COMFORT={floatingDamage:false,shakeScale:.12,maxShake:2.6,shakeMin:10,shakeCooldown:150};
 let lastShakeAt=0;
 function currentUltimateCfg(){return STYLE_ULTIMATES[state.ultimateStyleId||player?.style?.id||1]||STYLE_ULTIMATES[1];}
 function isStyleUltimateActive(id){return !!state.ultimateActive&&state.ultimateStyleId===id;}
-function ultimateEnemySlow(){if(!state.ultimateActive)return 1;return ({1:.5,2:.9,3:.75,4:.22,5:.55})[state.ultimateStyleId]||.7;}
-function ultimateMoveMult(){if(!state.ultimateActive)return 1;return ({1:1.35,2:1.18,3:1.1,4:1.0,5:1.3})[state.ultimateStyleId]||1;}
-function ultimateFireRateMult(){if(!state.ultimateActive)return 1;return ({1:4.2,2:1.7,3:2.1,4:1.35,5:2.4})[state.ultimateStyleId]||1;}
-function ultimatePierceBonus(){if(!state.ultimateActive)return 0;return ({1:4,2:1,3:8,4:24,5:5})[state.ultimateStyleId]||0;}
-function ultimateDamageMult(){if(!state.ultimateActive)return 1;return ({1:1.15,2:2.25,3:1.2,4:1.4,5:1.25})[state.ultimateStyleId]||1;}
-function combatDamageMult(){return (state.buffTimers.prism>0?1.5:1)*(state.buffTimers.forbidden>0?2:1)*ultimateDamageMult();}
-function fireRateBuff(){return state.buffTimers.mirror>0?1.75:1;}
-function speedBuff(){return state.buffTimers.muse>0?1.55:1;}
-function extraPierceBuff(){return state.buffTimers.prism>0?2:0;}
+function ultimateEnemySlow(){if(!state.ultimateActive)return 1;return ({1:.65,2:.92,3:.80,4:.45,5:.70})[state.ultimateStyleId]||.8;}
+function ultimateMoveMult(){if(!state.ultimateActive)return 1;return ({1:1.25,2:1.12,3:1.08,4:1.0,5:1.20})[state.ultimateStyleId]||1;}
+function ultimateFireRateMult(){if(!state.ultimateActive)return 1;return ({1:2.8,2:1.35,3:1.65,4:1.50,5:1.80})[state.ultimateStyleId]||1;}
+function ultimatePierceBonus(){if(!state.ultimateActive)return 0;return ({1:3,2:1,3:6,4:14,5:4})[state.ultimateStyleId]||0;}
+function ultimateDamageMult(){if(!state.ultimateActive)return 1;return ({1:1.10,2:1.55,3:1.10,4:1.45,5:1.15})[state.ultimateStyleId]||1;}
+function combatDamageMult(){let itemMult=1;if(state.buffTimers.prism>0)itemMult+=.35;if(state.buffTimers.forbidden>0)itemMult+=.60;return itemMult*ultimateDamageMult();}
+function fireRateBuff(){return state.buffTimers.mirror>0?1.45:1;}
+function speedBuff(){return state.buffTimers.muse>0?1.35:1;}
+function extraPierceBuff(){return state.buffTimers.prism>0?1:0;}
 function getPickupBonus(){return state.buffTimers.magnet>0?230:(player?.stats?.pickupRadius||0);}
-function setSkillCooldown(id){const sk=ACTIVE_SKILLS[id],mult=Math.max(.5,player.stats.skillCooldownMult||1);state.skillCooldowns[id]=Math.floor(sk.cd*60*mult);}
+function setSkillCooldown(id){const sk=ACTIVE_SKILLS[id],mult=Math.max(.65,player.stats.skillCooldownMult||1);state.skillCooldowns[id]=Math.floor(sk.cd*60*mult);}
 function registerSkillUse(){state.skillUses++;museumSave.totalSkills=(museumSave.totalSkills||0)+1;unlockAchievement('skill1');if(museumSave.totalSkills>=25)unlockAchievement('skill25');if(museumSave.totalSkills>=100)unlockAchievement('skill100');persistMuseumSave();}
 function useActiveSkill(id){
  if(state.gameState!=='PLAYING'||state.paused||!ACTIVE_SKILLS[id]||state.skillCooldowns[id]>0)return;
  registerSkillUse();setSkillCooldown(id);const cfg=eraCfg();
  if(id==='burst'){
-   for(let i=0;i<20;i++){const a=i/20*Math.PI*2;projectiles.push(new Projectile(player.x,player.y,a,11,24*player.stats.damageMult*combatDamageMult(),7*player.stats.projSizeMult,player.style,player.stats.pierce+1+extraPierceBuff(),110));}
+   for(let i=0;i<18;i++){const a=i/18*Math.PI*2;projectiles.push(new Projectile(player.x,player.y,a,11,20*player.stats.damageMult*combatDamageMult(),7*player.stats.projSizeMult,player.style,player.stats.pierce+1+extraPierceBuff(),105));}
    createParticles(player.x,player.y,player.style.color,40,0,360);applyCameraShake(14);showEraEvent('色彩爆裂：全向筆觸釋放','ACTIVE SKILL');
  }else if(id==='freeze'){
-   state.freezeTimer=Math.max(state.freezeTimer,300);createParticles(player.x,player.y,'#93c5fd',32,0,360);showEraEvent('凝時畫框：敵人與彈幕暫停','ACTIVE SKILL');
+   state.freezeTimer=Math.max(state.freezeTimer,180);createParticles(player.x,player.y,'#93c5fd',32,0,360);showEraEvent('凝時畫框：敵人與彈幕暫停','ACTIVE SKILL');
  }else if(id==='restore'){
-   player.heal(Math.max(24,player.maxHp*.22));player.shield=Math.min(player.stats.shieldMax||100,player.shield+35);state.restoreInvuln=100;createParticles(player.x,player.y,'#34d399',45,0,360);showEraEvent('修復領域：治療、護盾、短暫無敵','ACTIVE SKILL');
+   player.heal(Math.max(20,player.maxHp*.18));player.shield=Math.min(player.stats.shieldMax||100,player.shield+25);state.restoreInvuln=60;createParticles(player.x,player.y,'#34d399',45,0,360);showEraEvent('修復領域：治療、護盾、短暫無敵','ACTIVE SKILL');
    if(player.shield>=100)unlockAchievement('shield100');
  }else if(id==='rift'){
    const wx=state.mouse.x+state.camera.x,wy=state.mouse.y+state.camera.y,dx=wx-player.x,dy=wy-player.y,len=Math.hypot(dx,dy)||1,dist=Math.min(330,len);player.x+=dx/len*dist;player.y+=dy/len*dist;player.x=Math.max(-WORLD_SIZE/2+player.radius,Math.min(WORLD_SIZE/2-player.radius,player.x));player.y=Math.max(-WORLD_SIZE/2+player.radius,Math.min(WORLD_SIZE/2-player.radius,player.y));
-   enemies.forEach(e=>{if(Math.hypot(e.x-player.x,e.y-player.y)<200)e.hp=Math.max(1,e.hp-65*player.stats.damageMult*combatDamageMult());});enemyProjectiles=enemyProjectiles.filter(p=>Math.hypot(p.x-player.x,p.y-player.y)>220);createParticles(player.x,player.y,cfg.accent,50,0,360);applyCameraShake(18);showEraEvent('時代裂隙：瞬移並撕裂周圍敵人','ACTIVE SKILL');
+   enemies.forEach(e=>{if(Math.hypot(e.x-player.x,e.y-player.y)<185)e.hp=Math.max(1,e.hp-55*player.stats.damageMult*combatDamageMult());});enemyProjectiles=enemyProjectiles.filter(p=>Math.hypot(p.x-player.x,p.y-player.y)>190);createParticles(player.x,player.y,cfg.accent,50,0,360);applyCameraShake(18);showEraEvent('時代裂隙：瞬移並撕裂周圍敵人','ACTIVE SKILL');
  }
  SoundManager.playTone(900,'sine',.28,.24,1500);renderSkillHud();
 }
 function renderSkillHud(){
- Object.keys(ACTIVE_SKILLS).forEach(id=>{const sk=ACTIVE_SKILLS[id],max=sk.cd*60*Math.max(.5,player?.stats?.skillCooldownMult||1),cd=Math.max(0,state.skillCooldowns[id]||0),pct=max?Math.max(0,100*(1-cd/max)):100,chip=document.getElementById('skill-chip-'+id),fill=document.getElementById('skill-fill-'+id),txt=document.getElementById('skill-cd-'+id);if(fill)fill.style.width=pct+'%';if(txt)txt.innerText=cd>0?(cd/60).toFixed(1)+'s':'READY';if(chip)chip.classList.toggle('ready',cd<=0);});
+ Object.keys(ACTIVE_SKILLS).forEach(id=>{const sk=ACTIVE_SKILLS[id],max=sk.cd*60*Math.max(.65,player?.stats?.skillCooldownMult||1),cd=Math.max(0,state.skillCooldowns[id]||0),pct=max?Math.max(0,100*(1-cd/max)):100,chip=document.getElementById('skill-chip-'+id),fill=document.getElementById('skill-fill-'+id),txt=document.getElementById('skill-cd-'+id);if(fill)fill.style.width=pct+'%';if(txt)txt.innerText=cd>0?(cd/60).toFixed(1)+'s':'READY';if(chip)chip.classList.toggle('ready',cd<=0);});
  const strip=document.getElementById('buff-strip');if(strip){const labels=[];const map={prism:['PRISM','#67e8f9'],mirror:['MIRROR','#c084fc'],muse:['MUSE','#f9a8d4'],forbidden:['FORBIDDEN','#ef4444'],magnet:['MAGNET','#fde047']};for(const [k,v] of Object.entries(map))if(state.buffTimers[k]>0)labels.push(`<span class="buff-pill" style="border-color:${v[1]}55;color:${v[1]}">${v[0]} <strong>${Math.ceil(state.buffTimers[k]/60)}s</strong></span>`);if(player?.shield>0)labels.push(`<span class="buff-pill" style="border-color:#fbbf2455;color:#fbbf24">SHIELD <strong>${Math.ceil(player.shield)}</strong></span>`);if(state.freezeTimer>0)labels.push(`<span class="buff-pill" style="border-color:#93c5fd55;color:#93c5fd">TIME STOP <strong>${Math.ceil(state.freezeTimer/60)}s</strong></span>`);strip.innerHTML=labels.join('');}
 }
 function updateActiveSystems(){
@@ -1536,8 +1536,8 @@ class SpecialItem{
  draw(){ctx.save();ctx.translate(this.x,this.y+Math.sin(this.phase)*5);ctx.shadowBlur=22;ctx.shadowColor=this.def.color;ctx.strokeStyle=this.def.color;ctx.fillStyle=this.def.color+'22';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,this.radius+5+Math.sin(this.phase)*2,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle='#fff';ctx.font='700 20px Cinzel';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(this.def.icon,0,1);ctx.font='10px "Noto Serif TC"';ctx.fillStyle=this.def.color;ctx.fillText(this.def.name,0,35);ctx.restore();}
 }
 function spawnSpecialItem(forceId=null){if(specialItems.length>=5)return;const def=forceId?SPECIAL_ITEMS.find(x=>x.id===forceId):SPECIAL_ITEMS[Math.floor(Math.random()*SPECIAL_ITEMS.length)];if(!def)return;const a=Math.random()*Math.PI*2,d=260+Math.random()*420,x=Math.max(-WORLD_SIZE/2+60,Math.min(WORLD_SIZE/2-60,player.x+Math.cos(a)*d)),y=Math.max(-WORLD_SIZE/2+60,Math.min(WORLD_SIZE/2-60,player.y+Math.sin(a)*d));specialItems.push(new SpecialItem(def,x,y));showEraEvent(`地圖奇物出現：${def.name}`,'SPECIAL ARTIFACT');}
-function collectSpecialItem(item){const d=item.def,dur=Math.floor(900*(player.stats.itemDurationMult||1));state.itemCount++;state.collectedSpecialTypes.add(d.id);museumSave.totalItems=(museumSave.totalItems||0)+1;museumSave.itemTypes=museumSave.itemTypes||{};museumSave.itemTypes[d.id]=true;unlockAchievement('item1');if(museumSave.totalItems>=10)unlockAchievement('item10');if(Object.keys(museumSave.itemTypes).length>=SPECIAL_ITEMS.length)unlockAchievement('itemtypes');if(d.id==='FORBIDDEN')unlockAchievement('forbidden');
- if(d.id==='RESTORE')player.heal(35);else if(d.id==='FRAME'){player.shield=Math.min(player.stats.shieldMax||100,player.shield+50);if(player.shield>=100)unlockAchievement('shield100');}else if(d.id==='PRISM')state.buffTimers.prism=Math.max(state.buffTimers.prism,dur);else if(d.id==='MIRROR')state.buffTimers.mirror=Math.max(state.buffTimers.mirror,dur);else if(d.id==='MUSE')state.buffTimers.muse=Math.max(state.buffTimers.muse,dur);else if(d.id==='HOURGLASS')state.freezeTimer=Math.max(state.freezeTimer,300);else if(d.id==='MAGNET')state.buffTimers.magnet=Math.max(state.buffTimers.magnet,Math.floor(1080*(player.stats.itemDurationMult||1)));else if(d.id==='SIGNATURE'){addUltimateCharge(999);for(const k in state.skillCooldowns)state.skillCooldowns[k]=Math.floor(state.skillCooldowns[k]*.45);}else if(d.id==='FORBIDDEN'){state.buffTimers.forbidden=Math.max(state.buffTimers.forbidden,Math.floor(600*(player.stats.itemDurationMult||1)));player.hp=Math.max(1,player.hp-10);updateDomCache(uiHealthBar,'hp',`${(player.hp/player.maxHp)*100}%`,true);uiHpText.innerText=`${Math.floor(player.hp)}/${player.maxHp}`;}
+function collectSpecialItem(item){const d=item.def,dur=Math.floor(720*Math.min(1.75,player.stats.itemDurationMult||1));state.itemCount++;state.collectedSpecialTypes.add(d.id);museumSave.totalItems=(museumSave.totalItems||0)+1;museumSave.itemTypes=museumSave.itemTypes||{};museumSave.itemTypes[d.id]=true;unlockAchievement('item1');if(museumSave.totalItems>=10)unlockAchievement('item10');if(Object.keys(museumSave.itemTypes).length>=SPECIAL_ITEMS.length)unlockAchievement('itemtypes');if(d.id==='FORBIDDEN')unlockAchievement('forbidden');
+ if(d.id==='RESTORE')player.heal(30);else if(d.id==='FRAME'){player.shield=Math.min(player.stats.shieldMax||100,player.shield+40);if(player.shield>=100)unlockAchievement('shield100');}else if(d.id==='PRISM')state.buffTimers.prism=Math.max(state.buffTimers.prism,dur);else if(d.id==='MIRROR')state.buffTimers.mirror=Math.max(state.buffTimers.mirror,dur);else if(d.id==='MUSE')state.buffTimers.muse=Math.max(state.buffTimers.muse,dur);else if(d.id==='HOURGLASS')state.freezeTimer=Math.max(state.freezeTimer,180);else if(d.id==='MAGNET')state.buffTimers.magnet=Math.max(state.buffTimers.magnet,Math.floor(900*Math.min(1.75,player.stats.itemDurationMult||1)));else if(d.id==='SIGNATURE'){addUltimateCharge(999);for(const k in state.skillCooldowns)state.skillCooldowns[k]=Math.floor(state.skillCooldowns[k]*.70);}else if(d.id==='FORBIDDEN'){state.buffTimers.forbidden=Math.max(state.buffTimers.forbidden,Math.floor(480*Math.min(1.75,player.stats.itemDurationMult||1)));player.hp=Math.max(1,player.hp-Math.max(12,Math.round(player.maxHp*.12)));updateDomCache(uiHealthBar,'hp',`${(player.hp/player.maxHp)*100}%`,true);uiHpText.innerText=`${Math.floor(player.hp)}/${player.maxHp}`;}
  createParticles(item.x,item.y,d.color,34,0,360);SoundManager.playLevelUp();showEraEvent(`${d.name}：${d.desc}`,'ARTIFACT ACQUIRED');persistMuseumSave();}
 
 function setDifficulty(d){if(!DIFFICULTIES[d])return;state.difficulty=d;['GALLERY','CURATOR','MASTERPIECE'].forEach(x=>{const b=document.getElementById('diff-'+x.toLowerCase());if(b){b.style.borderColor=x===d?'#d4af37':'rgba(255,255,255,.2)';b.style.color=x===d?'#fff':'rgba(255,255,255,.8)';}});const h=document.getElementById('difficulty-hud');if(h)h.innerText=d;}
@@ -1819,14 +1819,14 @@ function activateUltimate() {
     state.ultimateStyleId=player.style.id;const u=currentUltimateCfg();state.ultimateDuration=u.duration;state.ultimateActive=true;state.ultimateTimer=u.duration;state.ultimatePulse=0;state.ultimateGauge=0;state.ultimateUses++;museumSave.totalUltimates=(museumSave.totalUltimates||0)+1;if(museumSave.totalUltimates>=10)unlockAchievement('ultimate10');persistMuseumSave();
     updateDomCache(uiUltimateBar,'ult','0%',true);uiUltimateBar.classList.remove('ultimate-ready');canvas.classList.add('ultimate-active-filter');applyCameraShake(24);SoundManager.playUltimateActive();
     const dmg=player.stats.damageMult*combatDamageMult();
-    if(state.ultimateStyleId===1){for(let i=0;i<16;i++){const a=i/16*Math.PI*2;projectiles.push(new Projectile(player.x,player.y,a,16,18*dmg,5*player.stats.projSizeMult,STYLES.IMPRESSIONISM,4,95));}enemyProjectiles=enemyProjectiles.filter(p=>Math.hypot(p.x-player.x,p.y-player.y)>260);}
-    else if(state.ultimateStyleId===2){for(const e of enemies){const dx=e.x-player.x,dy=e.y-player.y,d=Math.hypot(dx,dy);if(d<320){e.hp-=85*dmg;const k=(320-d)/320;e.x+=dx/(d||1)*85*k;e.y+=dy/(d||1)*85*k;}}createParticles(player.x,player.y,STYLES.FAUVISM.color,56,0,360);}
-    else if(state.ultimateStyleId===3){for(let i=0;i<18;i++){const a=i/18*Math.PI*2;projectiles.push(new PopArtProjectile(player.x,player.y,a,10.5,45*dmg,STYLES.POPART,8));}}
-    else if(state.ultimateStyleId===4){enemyProjectiles=[];for(let i=0;i<8;i++){const a=i/8*Math.PI*2;projectiles.push(new CubismProjectile(player.x,player.y,a,7,78*dmg,26*player.stats.projSizeMult,STYLES.CUBISM,30));}}
-    else if(state.ultimateStyleId===5){const converted=enemyProjectiles.slice(0,18);enemyProjectiles=[];for(const p of converted){projectiles.push(new SurrealProjectile(p.x,p.y,Math.random()*Math.PI*2,9,28*dmg,9*player.stats.projSizeMult,STYLES.SURREALISM,6));}player.heal(18);for(let i=0;i<10;i++){const a=i/10*Math.PI*2;projectiles.push(new SurrealProjectile(player.x,player.y,a,9,26*dmg,9*player.stats.projSizeMult,STYLES.SURREALISM,6));}}
+    if(state.ultimateStyleId===1){for(let i=0;i<16;i++){const a=i/16*Math.PI*2;projectiles.push(new Projectile(player.x,player.y,a,16,16*dmg,5*player.stats.projSizeMult,STYLES.IMPRESSIONISM,4,95));}enemyProjectiles=enemyProjectiles.filter(p=>Math.hypot(p.x-player.x,p.y-player.y)>260);}
+    else if(state.ultimateStyleId===2){for(const e of enemies){const dx=e.x-player.x,dy=e.y-player.y,d=Math.hypot(dx,dy);if(d<320){e.hp-=70*dmg;const k=(320-d)/320;e.x+=dx/(d||1)*85*k;e.y+=dy/(d||1)*85*k;}}createParticles(player.x,player.y,STYLES.FAUVISM.color,56,0,360);}
+    else if(state.ultimateStyleId===3){for(let i=0;i<18;i++){const a=i/18*Math.PI*2;projectiles.push(new PopArtProjectile(player.x,player.y,a,10.5,40*dmg,STYLES.POPART,8));}}
+    else if(state.ultimateStyleId===4){enemyProjectiles=[];for(let i=0;i<8;i++){const a=i/8*Math.PI*2;projectiles.push(new CubismProjectile(player.x,player.y,a,7,70*dmg,26*player.stats.projSizeMult,STYLES.CUBISM,30));}}
+    else if(state.ultimateStyleId===5){const converted=enemyProjectiles.slice(0,18);enemyProjectiles=[];for(const p of converted){projectiles.push(new SurrealProjectile(p.x,p.y,Math.random()*Math.PI*2,9,28*dmg,9*player.stats.projSizeMult,STYLES.SURREALISM,6));}player.heal(12);for(let i=0;i<10;i++){const a=i/10*Math.PI*2;projectiles.push(new SurrealProjectile(player.x,player.y,a,9,26*dmg,9*player.stats.projSizeMult,STYLES.SURREALISM,6));}}
     createParticles(player.x,player.y,player.style.color,42,0,360);showEraEvent(`${u.name}：${u.desc}`,'STYLE ULTIMATE');
 }
-function updateUltimateEffect(){if(!state.ultimateActive)return;state.ultimatePulse++;const id=state.ultimateStyleId,dmg=player.stats.damageMult*combatDamageMult();if(id===1&&state.ultimatePulse%28===0){for(let i=0;i<8;i++){const a=i/8*Math.PI*2+state.ultimatePulse*.04;projectiles.push(new Projectile(player.x,player.y,a,15,14*dmg,4*player.stats.projSizeMult,STYLES.IMPRESSIONISM,3,80));}}else if(id===2&&state.ultimatePulse%34===0){for(const e of enemies)if(Math.hypot(e.x-player.x,e.y-player.y)<210)e.hp-=12*dmg;createParticles(player.x,player.y,STYLES.FAUVISM.color,10,0,360);}else if(id===3&&state.ultimatePulse%48===0){for(let i=0;i<10;i++){const a=i/10*Math.PI*2+state.ultimatePulse*.025;projectiles.push(new PopArtProjectile(player.x,player.y,a,10,38*dmg,STYLES.POPART,7));}}else if(id===4&&state.ultimatePulse%58===0){for(let i=0;i<6;i++){const a=i/6*Math.PI*2+state.ultimatePulse*.018;projectiles.push(new CubismProjectile(player.x,player.y,a,6.5,66*dmg,23*player.stats.projSizeMult,STYLES.CUBISM,24));}}else if(id===5&&state.ultimatePulse%36===0){for(let i=0;i<6;i++){const a=i/6*Math.PI*2+Math.random()*.35;projectiles.push(new SurrealProjectile(player.x,player.y,a,9.5,22*dmg,8*player.stats.projSizeMult,STYLES.SURREALISM,5));}if(state.ultimatePulse%72===0)player.heal(2);}}
+function updateUltimateEffect(){if(!state.ultimateActive)return;state.ultimatePulse++;const id=state.ultimateStyleId,dmg=player.stats.damageMult*combatDamageMult();if(id===1&&state.ultimatePulse%28===0){for(let i=0;i<8;i++){const a=i/8*Math.PI*2+state.ultimatePulse*.04;projectiles.push(new Projectile(player.x,player.y,a,15,14*dmg,4*player.stats.projSizeMult,STYLES.IMPRESSIONISM,3,80));}}else if(id===2&&state.ultimatePulse%34===0){for(const e of enemies)if(Math.hypot(e.x-player.x,e.y-player.y)<210)e.hp-=12*dmg;createParticles(player.x,player.y,STYLES.FAUVISM.color,10,0,360);}else if(id===3&&state.ultimatePulse%48===0){for(let i=0;i<10;i++){const a=i/10*Math.PI*2+state.ultimatePulse*.025;projectiles.push(new PopArtProjectile(player.x,player.y,a,10,38*dmg,STYLES.POPART,7));}}else if(id===4&&state.ultimatePulse%58===0){for(let i=0;i<6;i++){const a=i/6*Math.PI*2+state.ultimatePulse*.018;projectiles.push(new CubismProjectile(player.x,player.y,a,6.5,66*dmg,23*player.stats.projSizeMult,STYLES.CUBISM,24));}}else if(id===5&&state.ultimatePulse%36===0){for(let i=0;i<6;i++){const a=i/6*Math.PI*2+Math.random()*.35;projectiles.push(new SurrealProjectile(player.x,player.y,a,9.5,22*dmg,8*player.stats.projSizeMult,STYLES.SURREALISM,5));}if(state.ultimatePulse%90===0)player.heal(1.5);}}
 
 const SHOP_ITEMS = [
     { name: "結構修補", en: "STRUCTURAL REPAIR", desc: "恢復 50 點結構完整度", price: 50, apply: (p) => p.heal(50), color: '#34d399' },
@@ -3226,7 +3226,7 @@ function gameLoop(rafNow=performance.now()) {
             if(doUpdate) c.update(player); 
             c.draw();
             if (!player.isDashing && checkCollisionFastSq(player.x,player.y,player.radius+getPickupBonus(),c.x,c.y,c.radius)) {
-                state.coins+=Math.ceil(c.value*(player.stats.coinMult||1)*(state.buffTimers.magnet>0?2:1));if(state.coins>=300)unlockAchievement('rich');if(state.coins>=600)unlockAchievement('richer');
+                state.coins+=Math.ceil(c.value*(player.stats.coinMult||1)*(state.buffTimers.magnet>0?1.5:1));if(state.coins>=300)unlockAchievement('rich');if(state.coins>=600)unlockAchievement('richer');
                 updateDomCache(uiCoinDisplay, 'coins', state.coins);
                 createParticles(c.x, c.y, c.color, 4, 0, 360);
                 SoundManager.playCoinCollect(); 
