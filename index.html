@@ -1360,7 +1360,22 @@ function loadMuseumSave(){try{return Object.assign(defaultMuseumSave(),JSON.pars
 let museumSave=loadMuseumSave();
 function persistMuseumSave(){try{localStorage.setItem('disorderlyAestheticsFinalSave',JSON.stringify(museumSave));}catch(e){}}
 function eraCfg(id=state?.currentEra){return ERA_CONFIGS[id]||ERA_CONFIGS.PREHISTORIC;}
-function unlockAchievement(id){if(museumSave.achievements[id])return; const a=ACHIEVEMENTS.find(x=>x.id===id); if(!a)return; museumSave.achievements[id]=true; persistMuseumSave(); const t=document.getElementById('achievement-toast-title'),d=document.getElementById('achievement-toast-desc'); if(t)t.innerText=a.title;if(d)d.innerText=a.desc;if(achievementToast){achievementToast.classList.add('show');setTimeout(()=>achievementToast.classList.remove('show'),3200);} }
+let achievementQueue=[],achievementShowing=false,achievementHideTimer=null;
+function showNextAchievement(){
+    if(achievementShowing||!achievementQueue.length||!achievementToast)return;
+    achievementShowing=true;
+    const a=achievementQueue.shift(),t=document.getElementById('achievement-toast-title'),d=document.getElementById('achievement-toast-desc');
+    if(t)t.innerText=a.title;if(d)d.innerText=a.desc;
+    achievementToast.classList.add('show');
+    if(achievementHideTimer)clearTimeout(achievementHideTimer);
+    achievementHideTimer=setTimeout(()=>{achievementToast.classList.remove('show');achievementShowing=false;achievementHideTimer=null;setTimeout(showNextAchievement,180);},2600);
+}
+function unlockAchievement(id){
+    if(museumSave.achievements[id])return;
+    const a=ACHIEVEMENTS.find(x=>x.id===id);if(!a)return;
+    museumSave.achievements[id]=true;persistMuseumSave();
+    achievementQueue.push(a);showNextAchievement();
+}
 function formatTime(ms){const sec=Math.max(0,Math.floor(ms/1000));return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');}
 
 const state = {
@@ -1448,7 +1463,7 @@ function useActiveSkill(id){
    for(let i=0;i<20;i++){const a=i/20*Math.PI*2;projectiles.push(new Projectile(player.x,player.y,a,11,24*player.stats.damageMult*combatDamageMult(),7*player.stats.projSizeMult,player.style,player.stats.pierce+1+extraPierceBuff(),110));}
    createParticles(player.x,player.y,player.style.color,40,0,360);applyCameraShake(14);showEraEvent('色彩爆裂：全向筆觸釋放','ACTIVE SKILL');
  }else if(id==='freeze'){
-   state.freezeTimer=Math.max(state.freezeTimer,300);enemyProjectiles.forEach(p=>{p.vx*=.5;p.vy*=.5;});createParticles(player.x,player.y,'#93c5fd',32,0,360);showEraEvent('凝時畫框：敵人與彈幕暫停','ACTIVE SKILL');
+   state.freezeTimer=Math.max(state.freezeTimer,300);createParticles(player.x,player.y,'#93c5fd',32,0,360);showEraEvent('凝時畫框：敵人與彈幕暫停','ACTIVE SKILL');
  }else if(id==='restore'){
    player.heal(Math.max(24,player.maxHp*.22));player.shield=Math.min(player.stats.shieldMax||100,player.shield+35);state.restoreInvuln=100;createParticles(player.x,player.y,'#34d399',45,0,360);showEraEvent('修復領域：治療、護盾、短暫無敵','ACTIVE SKILL');
    if(player.shield>=100)unlockAchievement('shield100');
@@ -1587,7 +1602,7 @@ function startCampaign(){
     state.campaignMode=true;
     startGame('PREHISTORIC');
 }
-function goToLobby(){SoundManager.playUI();state.gameState='LOBBY';state.running=true;state.paused=false;state.shopOpen=false;state.campaignMode=false;state.endlessMode=false;state.endlessBossCount=0;state.endlessNextBossAt=0;state.endlessBossInterval=0;state.endlessBossCountdownMs=0;state.endlessStartedAt=0;state.endlessLastBossEra=null;state.activeBoss=null;state.eraComplete=false;['game-over-screen','story-screen','tutorial-screen','era-complete-screen','archive-screen','era-select-screen','upgrade-screen','shop-screen','pause-screen'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));upgradeScreen.classList.remove('opacity-0');document.getElementById('lobby-screen').classList.remove('hidden');uiLayer.classList.add('hidden');campaignProgressEl.classList.add('hidden');bossUiEl.classList.add('hidden','opacity-0');bossUiEl.classList.remove('opacity-100');SoundManager.stopAmbientBGM();canvas.classList.remove('ultimate-active-filter');state.currentEra=null;enemies=[];projectiles=[];enemyProjectiles=[];drops=[];coinsList=[];specialItems=[];damageTexts=[];splatters=[];screenSplatters=[];particles=[];state.keys={};state.mouse.isDown=false;state.cameraShake=0;state.hitStop=0;if(artifactIndicator)artifactIndicator.classList.remove('show');chapterToast.classList.remove('show');eraEventToast.classList.remove('show');achievementToast.classList.remove('show');updateStyleLensPanel();buildEraCards();}
+function goToLobby(){SoundManager.playUI();state.gameState='LOBBY';state.running=true;state.paused=false;state.shopOpen=false;state.campaignMode=false;state.endlessMode=false;state.endlessBossCount=0;state.endlessNextBossAt=0;state.endlessBossInterval=0;state.endlessBossCountdownMs=0;state.endlessStartedAt=0;state.endlessLastBossEra=null;state.activeBoss=null;state.eraComplete=false;['game-over-screen','story-screen','tutorial-screen','era-complete-screen','archive-screen','era-select-screen','upgrade-screen','shop-screen','pause-screen'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));upgradeScreen.classList.remove('opacity-0');document.getElementById('lobby-screen').classList.remove('hidden');uiLayer.classList.add('hidden');campaignProgressEl.classList.add('hidden');bossUiEl.classList.add('hidden','opacity-0');bossUiEl.classList.remove('opacity-100');SoundManager.stopAmbientBGM();canvas.classList.remove('ultimate-active-filter');state.currentEra=null;enemies=[];projectiles=[];enemyProjectiles=[];drops=[];coinsList=[];specialItems=[];damageTexts=[];splatters=[];screenSplatters=[];particles=[];state.keys={};state.mouse.isDown=false;state.cameraShake=0;state.hitStop=0;if(artifactIndicator)artifactIndicator.classList.remove('show');chapterToast.classList.remove('show');eraEventToast.classList.remove('show');achievementToast.classList.remove('show');if(chapterToastHideTimer){clearTimeout(chapterToastHideTimer);chapterToastHideTimer=null;}achievementQueue=[];achievementShowing=false;if(achievementHideTimer){clearTimeout(achievementHideTimer);achievementHideTimer=null;}updateStyleLensPanel();buildEraCards();}
 function showEraSelect(){SoundManager.init();SoundManager.playUI();document.getElementById('lobby-screen').classList.add('hidden');eraCompleteScreen.classList.add('hidden');eraSelectScreen.classList.remove('hidden');buildEraCards();setDifficulty(state.difficulty);}
 function showEraSelectFromComplete(){state.paused=false;state.gameState='LOBBY';state.shopOpen=false;eraCompleteScreen.classList.add('hidden');uiLayer.classList.add('hidden');campaignProgressEl.classList.add('hidden');if(artifactIndicator)artifactIndicator.classList.remove('show');updateStyleLensPanel();SoundManager.stopAmbientBGM();eraSelectScreen.classList.remove('hidden');buildEraCards();}
 function hideEraSelect(){SoundManager.playUI();eraSelectScreen.classList.add('hidden');document.getElementById('lobby-screen').classList.remove('hidden');}
@@ -1605,14 +1620,15 @@ function selectEra(era){
 }
 function restartEra(){eraCompleteScreen.classList.add('hidden');if(state.endlessMode)startEndlessMode();else startGame(state.currentEra||'PREHISTORIC');}
 function startNextEra(){const i=ERA_ORDER.indexOf(state.currentEra);if(i>=0&&i<ERA_ORDER.length-1){state.campaignMode=true;eraCompleteScreen.classList.add('hidden');startGame(ERA_ORDER[i+1]);}else{goToLobby();showArchive();}}
-function showChapterToast(){const cfg=eraCfg();chapterEraCode.innerText=cfg.code;chapterEraName.innerText=cfg.name;chapterEraSubtitle.innerText=`${cfg.zone} · ${cfg.period}`;chapterEraCode.style.color=cfg.accent;chapterEraName.style.color=cfg.accent;chapterToast.classList.add('show');setTimeout(()=>chapterToast.classList.remove('show'),2400);}
+let chapterToastHideTimer=null;
+function showChapterToast(){const cfg=eraCfg();chapterEraCode.innerText=cfg.code;chapterEraName.innerText=cfg.name;chapterEraSubtitle.innerText=`${cfg.zone} · ${cfg.period}`;chapterEraCode.style.color=cfg.accent;chapterEraName.style.color=cfg.accent;chapterToast.classList.add('show');if(chapterToastHideTimer)clearTimeout(chapterToastHideTimer);chapterToastHideTimer=setTimeout(()=>{chapterToast.classList.remove('show');chapterToastHideTimer=null;},2400);}
 function updateEraHud(){const cfg=eraCfg();if(state.endlessMode){if(eraCodeEl){eraCodeEl.innerText='∞ ENDLESS';eraCodeEl.style.color='#b91c1c';}if(eraNameEl){eraNameEl.innerText='無盡策展 · 失序收藏庫';eraNameEl.style.color='#171717';}if(eraMechanicTextEl)eraMechanicTextEl.innerText='無時間限制 · 隨機年代 Boss 會持續入侵';const dh=document.getElementById('difficulty-hud');if(dh)dh.innerText=`ENDLESS · ${state.difficulty}`;eraProgressFill.style.background='#b91c1c';return;}if(eraCodeEl){eraCodeEl.innerText=cfg.code;eraCodeEl.style.color=cfg.accent;}if(eraNameEl){eraNameEl.innerText=`${cfg.name} · ${cfg.zone}`;eraNameEl.style.color=cfg.accent;}if(eraMechanicTextEl)eraMechanicTextEl.innerText=cfg.mechanic;const dh=document.getElementById('difficulty-hud');if(dh)dh.innerText=state.difficulty;eraProgressFill.style.background=cfg.accent;}
 function updateEraProgress(){if(!eraProgressText||!eraProgressFill)return;if(state.endlessMode){if(state.activeBoss){const bc=ERA_CONFIGS[state.activeBoss.eraId]||eraCfg();eraProgressText.innerText=`BOSS #${state.activeBoss.endlessNumber||state.endlessBossCount+1} · ${bc.boss}`;eraProgressFill.style.width='100%';}else{const remain=Math.max(0,state.endlessBossCountdownMs||0);const total=Math.max(1,state.endlessBossInterval||remain||1);const pct=Math.max(0,Math.min(100,100-remain/total*100));eraProgressText.innerText=`已擊敗 ${state.endlessBossCount} · 下一次異常約 ${Math.ceil(remain/1000)} 秒`;eraProgressFill.style.width=`${pct}%`;}return;}const cfg=eraCfg(),shown=Math.min(state.eraKills,state.eraTarget);if(state.eraBossSpawned&&state.activeBoss){eraProgressText.innerText=`BOSS · ${cfg.boss}`;eraProgressFill.style.width='100%';}else{eraProgressText.innerText=`修復 ${shown} / ${state.eraTarget}`;eraProgressFill.style.width=`${Math.min(100,shown/state.eraTarget*100)}%`;}}
 function registerEraKill(enemy){
  if(!state.currentEra||state.eraComplete)return;museumSave.totalKills=(museumSave.totalKills||0)+1;if(museumSave.totalKills===1)unlockAchievement('first');
  if(player.stats.killHeal>0)player.heal(player.stats.killHeal);if(player.stats.killShield>0)player.shield=Math.min(player.stats.shieldMax||100,player.shield+player.stats.killShield);
  if(player.stats.explosionOnKill>0){for(const e of enemies){if(e!==enemy&&Math.hypot(e.x-enemy.x,e.y-enemy.y)<125)e.hp=Math.max(1,e.hp-player.stats.explosionOnKill*player.stats.damageMult);}createParticles(enemy.x,enemy.y,'#f59e0b',12,0,360);}
- if(enemy.type===4){museumSave.totalBosses=(museumSave.totalBosses||0)+1;unlockAchievement('boss1');if(museumSave.totalBosses>=5)unlockAchievement('boss5');if(museumSave.totalBosses>=10)unlockAchievement('boss10');if(state.damageTaken<=state.bossDamageSnapshot)unlockAchievement('perfectboss');state.activeBoss=null;bossUiEl.classList.add('opacity-0');setTimeout(()=>bossUiEl.classList.add('hidden'),350);if(state.endlessMode){state.endlessBossCount++;state.eraKills++;const bossEra=ERA_CONFIGS[enemy.eraId]||eraCfg();addScore(750+state.endlessBossCount*125);showEraEvent(`Boss #${state.endlessBossCount}《${bossEra.boss}》已封印，下一個異常正在形成`,'ENDLESS CLEAR');scheduleNextEndlessBoss(false);updateEraProgress();}else{state.eraComplete=true;setTimeout(()=>finishEra(),650);}}else{state.eraKills++;updateEraProgress();}
+ if(enemy.type===4){museumSave.totalBosses=(museumSave.totalBosses||0)+1;unlockAchievement('boss1');if(museumSave.totalBosses>=5)unlockAchievement('boss5');if(museumSave.totalBosses>=10)unlockAchievement('boss10');if(state.damageTaken<=state.bossDamageSnapshot)unlockAchievement('perfectboss');state.activeBoss=null;bossUiEl.classList.add('opacity-0');setTimeout(()=>bossUiEl.classList.add('hidden'),350);if(state.endlessMode){state.endlessBossCount++;state.eraKills++;const bossEra=ERA_CONFIGS[enemy.eraId]||eraCfg();addScore(750+state.endlessBossCount*125);showEraEvent(`Boss #${state.endlessBossCount}《${bossEra.boss}》已封印，下一個異常正在形成`,'ENDLESS CLEAR');scheduleNextEndlessBoss(false);updateEraProgress();}else{state.eraComplete=true;const completedEra=state.currentEra;const completedRunStart=state.runStartTime;setTimeout(()=>{if(state.gameState==='PLAYING'&&!state.endlessMode&&state.eraComplete&&state.currentEra===completedEra&&state.runStartTime===completedRunStart)finishEra();},650);}}else{state.eraKills++;updateEraProgress();}
  persistMuseumSave();
 }
 function finishEra(){if(state.endlessMode)return;const cfg=eraCfg(),elapsed=Math.max(0,state.playElapsedMs||0);state.paused=true;state.shopOpen=false;if(artifactIndicator)artifactIndicator.classList.remove('show');upgradeScreen.classList.add('hidden');upgradeScreen.classList.remove('opacity-0');shopScreen.classList.add('hidden');pauseScreen.classList.add('hidden');updateStyleLensPanel();SoundManager.stopAmbientBGM();museumSave.completed[state.currentEra]=true;museumSave.bestScores[state.currentEra]=Math.max(museumSave.bestScores[state.currentEra]||0,state.score);const old=museumSave.bestTimes[state.currentEra];if(!old||elapsed<old)museumSave.bestTimes[state.currentEra]=elapsed;const completedCount=Object.keys(museumSave.completed).filter(k=>museumSave.completed[k]).length;if(completedCount>=5)unlockAchievement('five');if(completedCount>=ERA_ORDER.length)unlockAchievement('all');if(state.campaignMode&&state.currentEra==='DIGITAL')unlockAchievement('campaign');if(state.difficulty==='MASTERPIECE')unlockAchievement('masterpiece');if(elapsed<=240000)unlockAchievement('speedrun');if(state.damageTaken<=0)unlockAchievement('untouched');persistMuseumSave();document.getElementById('era-final-score').innerText=state.score;document.getElementById('era-final-kills').innerText=state.eraKills;document.getElementById('era-final-combo').innerText=state.maxComboRun;document.getElementById('era-final-time').innerText=formatTime(elapsed);document.getElementById('era-complete-title').innerText=`${cfg.name} · 修復完成`;document.getElementById('era-complete-desc').innerHTML=`《${cfg.boss}》已重新封印。<br>${cfg.bossDesc}`;const idx=ERA_ORDER.indexOf(state.currentEra);const next=document.getElementById('next-era-btn');next.innerText=idx<ERA_ORDER.length-1?'下一時代':'查看完整館藏';eraCompleteScreen.classList.remove('hidden');SoundManager.playLevelUp();buildEraCards();}
@@ -2549,7 +2565,7 @@ function updatePrehistoricEnemy(e, player) {
 }
 
 
-function applyEraEnemyProfile(e,isBoss=false){const cfg=eraCfg(),df=diffCfg();const scale=(1+(cfg.index-1)*.055)*df.enemyHp;const stats=[{r:20,hp:62,sp:1.35,dmg:9},{r:29,hp:190,sp:.62,dmg:17},{r:17,hp:52,sp:1.05,dmg:11},{r:19,hp:78,sp:1.28,dmg:14}];if(isBoss||e.type===4){e.radius=64+cfg.index*2;e.speed=.58+cfg.index*.015;e.maxHp=1450+cfg.index*250;e.damage=(24+cfg.index*1.8)*df.enemyDmg;e.vertices=10+cfg.index%4;}else{const st=stats[e.type]||stats[0];e.radius=st.r;e.speed=st.sp*(1+cfg.index*.018);e.maxHp=Math.round(st.hp*scale);e.damage=Math.round(st.dmg*(1+cfg.index*.035)*df.enemyDmg);}e.hp=e.maxHp;e.color=e.pigment.id!==0?e.pigment.color:cfg.palette[e.type%cfg.palette.length];e.eraId=state.currentEra;return e;}
+function applyEraEnemyProfile(e,isBoss=false){const cfg=eraCfg(),df=diffCfg();const scale=(1+(cfg.index-1)*.055)*df.enemyHp;const stats=[{r:20,hp:62,sp:1.35,dmg:9},{r:29,hp:190,sp:.62,dmg:17},{r:17,hp:52,sp:1.05,dmg:11},{r:19,hp:78,sp:1.28,dmg:14}];if(isBoss||e.type===4){e.radius=64+cfg.index*2;e.speed=.58+cfg.index*.015;e.maxHp=Math.round((1450+cfg.index*250)*df.enemyHp);e.damage=(24+cfg.index*1.8)*df.enemyDmg;e.vertices=10+cfg.index%4;}else{const st=stats[e.type]||stats[0];e.radius=st.r;e.speed=st.sp*(1+cfg.index*.018);e.maxHp=Math.round(st.hp*scale);e.damage=Math.round(st.dmg*(1+cfg.index*.035)*df.enemyDmg);}e.hp=e.maxHp;e.color=e.pigment.id!==0?e.pigment.color:cfg.palette[e.type%cfg.palette.length];e.eraId=state.currentEra;return e;}
 function drawEnemyHp(e){if(e.hp>=e.maxHp||e.type===4)return;ctx.fillStyle='rgba(0,0,0,.36)';ctx.fillRect(-e.radius,-e.radius-16,e.radius*2,4);ctx.fillStyle=eraCfg().accent;ctx.fillRect(-e.radius,-e.radius-16,e.radius*2*(e.hp/e.maxHp),4);}
 function strokeAura(e){if(e.type===4)return;ctx.save();ctx.globalAlpha=.28+.12*Math.sin(Date.now()/180);ctx.strokeStyle=e.pigment.color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,e.radius*1.45,0,Math.PI*2);ctx.stroke();ctx.restore();}
 function poly(n,r,fill,stroke='#fff3',rot=0){ctx.save();ctx.rotate(rot);ctx.beginPath();for(let i=0;i<n;i++){const a=i/n*Math.PI*2-Math.PI/2;(i?ctx.lineTo:ctx.moveTo).call(ctx,Math.cos(a)*r,Math.sin(a)*r);}ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke();ctx.restore();}
@@ -2842,7 +2858,7 @@ function levelUp() {
                 upgradeScreen.classList.remove('opacity-0');
                 upgradeContainer.style.pointerEvents='';
                 if(state.gameState!=='PLAYING')return;
-                if(state.xp>=state.xpNeeded&&(!state.eraComplete||state.endlessMode)){state.xp-=state.xpNeeded;levelUp();}
+                if(state.xp>=state.xpNeeded&&(!state.eraComplete||state.endlessMode)){state.xp-=state.xpNeeded;updateDomCache(uiXpBar,'xp',`${(state.xp/state.xpNeeded)*100}%`,true);levelUp();}
                 else{state.paused=false;state.lastActiveTickAt=performance.now();updateStyleLensPanel();}
             }, 350);
         };
@@ -3196,6 +3212,7 @@ function gameLoop() {
 
             if (enemy.spawnScale >= 1 && checkCollisionFastSq(player.x, player.y, player.radius, enemy.x, enemy.y, enemy.radius)) {
                 player.takeDamage(enemy.damage);
+                if(state.gameState!=='PLAYING'){ctx.restore();return;}
                 if (!player.isDashing && !state.ultimateActive && enemy.type !== 4) {
                     const angle = Math.atan2(enemy.y - player.y, enemy.x - player.x);
                     enemy.x += Math.cos(angle) * 30; enemy.y += Math.sin(angle) * 30;
@@ -3214,7 +3231,7 @@ function gameLoop() {
             if (ep.life <= 0 || outOfBounds) { enemyProjectiles.splice(i, 1); continue; }
             
             if (checkCollisionFastSq(player.x, player.y, player.radius, ep.x, ep.y, ep.radius)) {
-                player.takeDamage(ep.damage); enemyProjectiles.splice(i, 1);
+                player.takeDamage(ep.damage); enemyProjectiles.splice(i, 1);if(state.gameState!=='PLAYING'){ctx.restore();return;}
             }
         }
 
