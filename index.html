@@ -1854,6 +1854,14 @@ function closeShop() {
     shopScreen.classList.add('hidden');updateStyleLensPanel();
 }
 
+function shopItemUseful(item){
+    if(item.en==='STRUCTURAL REPAIR')return player.hp<player.maxHp;
+    if(item.en==='CANVAS EXPANSION')return player.maxHp<190||player.hp<player.maxHp;
+    if(item.en==='HASTE INSPIRATION')return player.stats.speedMult<1.8;
+    if(item.en==='ULTIMATE STIMULANT')return state.ultimateGauge<state.ultimateMax;
+    if(item.en==='MASTERPIECE SHARD')return player.stats.damageMult<2.5;
+    return true;
+}
 function renderShop() {
     shopContainer.innerHTML = '';
     let shuffled = [...SHOP_ITEMS].sort(() => 0.5 - Math.random());
@@ -1861,8 +1869,9 @@ function renderShop() {
 
     choices.forEach(item => {
         const card = document.createElement('div');
-        const canAfford = state.coins >= item.price;
-        card.className = `upgrade-card p-6 flex flex-col justify-between items-center text-center relative group ${canAfford ? '' : 'opacity-50 grayscale cursor-not-allowed'}`;
+        const useful=shopItemUseful(item);
+        const canAfford=state.coins>=item.price&&useful;
+        card.className=`upgrade-card p-6 flex flex-col justify-between items-center text-center relative group ${canAfford?'':'opacity-50 grayscale cursor-not-allowed'}`;
         card.innerHTML = `
             <div class="w-full flex flex-col items-center">
                 <div class="elegant-line mb-6 opacity-30 w-1/2 group-hover:w-full transition-all duration-500"></div>
@@ -1871,7 +1880,7 @@ function renderShop() {
                 <h3 class="text-xl font-serif-tc font-light text-white tracking-[0.1em] mb-4">${item.name}</h3>
                 <div class="text-[#fcd34d] font-cinzel text-xl font-bold tracking-wider">🪙 ${item.price}</div>
             </div>
-            <div class="w-full"><p class="text-gray-400 text-sm font-light leading-relaxed tracking-wider border-t border-white/10 pt-4 mt-4">${item.desc}</p></div>
+            <div class="w-full"><p class="text-gray-400 text-sm font-light leading-relaxed tracking-wider border-t border-white/10 pt-4 mt-4">${item.desc}${useful?'':' · 已達目前上限'}</p></div>
         `;
         if (canAfford) {
             card.onclick = () => {
@@ -2872,8 +2881,55 @@ function levelUp() {
         {name:'安全裝裱',en:'SAFE FRAMING',desc:'立刻獲得 30 護盾',apply:p=>{p.shield=Math.min(p.stats.shieldMax,p.shield+30)},color:'#fcd34d'}
     ];
 
-    let shuffled = [...RELIC_POOL].sort(() => 0.5 - Math.random());
-    let choices = shuffled.slice(0, 4);
+    function talentStillUseful(t){
+        const p=player;
+        switch(t.en){
+            case 'RAPID SKETCH': return p.stats.fireRateMult<2.05;
+            case 'FERAL INSTINCT': return p.stats.damageMult<2.5;
+            case 'MASS REPRODUCTION': return p.stats.pierce<8||p.stats.projSizeMult<2;
+            case 'SPATIAL RECONSTRUCT': return p.maxDashCooldown>36;
+            case 'GRAND CANVAS': return p.stats.projSizeMult<2||p.stats.damageMult<2.5;
+            case 'POINTILLISM MINE': return (p.stats.dashMineDamage||0)<38;
+            case 'SURREAL EVASION': return (p.stats.evasionChance||0)<.22;
+            case 'STARRY ORBIT': return p.stats.orbitals<4;
+            case 'VAMPIRIC STROKE': return (p.stats.lifestealChance||0)<.08;
+            case 'CRITICAL EYE': return p.stats.critChance<.35||p.stats.critMult<2.35;
+            case 'BOSS ANATOMY': return p.stats.bossDamageMult<1.75;
+            case 'QUICK CURATION': return p.stats.skillCooldownMult>.65;
+            case 'COLOR RECLAIM': return p.stats.killHeal<2.4;
+            case 'GILDED GUARD': return p.stats.killShield<4.5||p.stats.shieldMax<180;
+            case 'SELF RESTORATION': return p.stats.regen<1.2;
+            case 'HEAVY GESSO': return p.stats.defenseMult>.65;
+            case 'FAST STUDY': return p.stats.xpMult<2;
+            case 'ART INVESTOR': return p.stats.coinMult<2;
+            case 'CRITIC BONUS': return p.stats.scoreMult<2;
+            case 'COLLECTION FIELD': return p.stats.pickupRadius<270;
+            case 'LASTING MEDIUM': return p.stats.itemDurationMult<1.75;
+            case 'ARTIFACT SENSE': return p.stats.itemSpawnRate<1.75;
+            case 'FINAL STROKE': return p.stats.executeThreshold<.16;
+            case 'DEATH SPLASH': return p.stats.explosionOnKill<72;
+            case 'ULTIMATE FLOW': return p.stats.ultimateGainMult<2;
+            case 'FLOW STATE': return state.maxComboTimer<360;
+            case 'THORN FRAME': return (p.stats.thorns||0)<60;
+            case 'VITAL CANVAS': return p.maxHp<190||p.hp<p.maxHp;
+            case 'PRISMATIC PATH': return p.stats.pierce<8||p.stats.projSizeMult<2;
+            case 'CURATOR SHORTCUT': return p.stats.speedMult<1.8;
+            case 'REFINED PIGMENT': return p.stats.damageMult<2.5||p.stats.fireRateMult<2.05;
+            case 'SAFE FRAMING': return p.shield<p.stats.shieldMax;
+            default:return true;
+        }
+    }
+    let availableRelics=RELIC_POOL.filter(talentStillUseful);
+    let shuffled=[...availableRelics].sort(()=>0.5-Math.random());
+    let choices=shuffled.slice(0,4);
+    if(choices.length===0){
+        choices=[
+            {name:'緊急修復',en:'EMERGENCY RESTORE',desc:'所有主要構築已達上限，恢復 30 HP',apply:p=>p.heal(30),color:'#34d399'},
+            {name:'臨時裝裱',en:'TEMPORARY FRAME',desc:'所有主要構築已達上限，獲得 30 護盾',apply:p=>p.shield=Math.min(p.stats.shieldMax,p.shield+30),color:'#fbbf24'},
+            {name:'靈感補充',en:'INSPIRATION REFILL',desc:'所有主要構築已達上限，補充 35% 大絕能量',apply:p=>addUltimateCharge(35),color:'#f472b6'},
+            {name:'館藏基金',en:'MUSEUM FUND',desc:'所有主要構築已達上限，獲得 60 藝術經費',apply:p=>{state.coins+=60;updateDomCache(uiCoinDisplay,'coins',state.coins)},color:'#fde047'}
+        ];
+    }
     
     upgradeContainer.innerHTML = '';
     choices.forEach((choice) => {
