@@ -194,6 +194,342 @@
         .buff-pill{font:700 8px Cinzel;letter-spacing:.13em;padding:5px 8px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.62);color:#d1d5db;white-space:nowrap}
         .buff-pill strong{color:white;margin-left:5px}
         @media(max-width:900px){#active-skill-hud{bottom:48px;gap:4px}.skill-chip{width:92px;padding:7px}.skill-chip .name{font-size:9px}.skill-chip .key{width:19px;height:19px}.skill-chip .cd{display:none}#buff-strip{bottom:92px}}
+
+
+/* =========================================================
+   UI REDESIGN V2 — MUSEUM FIELD CONSOLE
+   Entire interface language intentionally diverges from the
+   original monochrome/glass layout while preserving DOM IDs.
+   ========================================================= */
+:root{
+  --ui-ink:#171717;
+  --ui-paper:#f3efe5;
+  --ui-paper-2:#ded7c8;
+  --ui-red:#d84b39;
+  --ui-blue:#315c72;
+  --ui-shadow:0 18px 50px rgba(0,0,0,.28);
+}
+body{font-family:'Outfit','Noto Sans TC',system-ui,sans-serif;}
+.font-serif-tc{font-family:'Noto Serif TC',serif;}
+
+/* Global panels and buttons */
+.premium-glass{
+  background:rgba(244,239,227,.92)!important;
+  color:var(--ui-ink)!important;
+  border:0!important;
+  border-radius:18px!important;
+  box-shadow:var(--ui-shadow)!important;
+  backdrop-filter:blur(16px) saturate(.9)!important;
+  -webkit-backdrop-filter:blur(16px) saturate(.9)!important;
+}
+.btn-elegant{
+  border:0!important;
+  border-radius:999px!important;
+  background:#f3efe5!important;
+  color:#171717!important;
+  box-shadow:0 10px 26px rgba(0,0,0,.18)!important;
+  font-family:'Outfit',sans-serif!important;
+  font-weight:700!important;
+  letter-spacing:.08em!important;
+  overflow:visible!important;
+}
+.btn-elegant::before{display:none!important;}
+.btn-elegant:hover{
+  background:#171717!important;
+  color:#f3efe5!important;
+  transform:translateY(-3px)!important;
+  box-shadow:0 18px 36px rgba(0,0,0,.28)!important;
+}
+
+/* Lobby — asymmetrical editorial cover instead of centered title screen */
+#lobby-screen{
+  align-items:stretch!important;
+  justify-content:stretch!important;
+  background:
+    linear-gradient(90deg,rgba(15,15,15,.22),rgba(15,15,15,.7)),
+    radial-gradient(circle at 14% 20%,rgba(216,75,57,.22),transparent 34%),
+    radial-gradient(circle at 82% 78%,rgba(49,92,114,.28),transparent 38%),
+    #111!important;
+  backdrop-filter:none!important;
+}
+#lobby-screen::before{
+  content:'';position:absolute;inset:18px;border:1px solid rgba(243,239,229,.22);pointer-events:none;z-index:2;
+}
+#lobby-screen::after{
+  content:'ABSOLUTE MUSEUM / FIELD CONSOLE 07';position:absolute;left:34px;top:30px;z-index:3;color:#d8d2c6;font:700 10px Outfit;letter-spacing:.28em;
+}
+#lobby-content{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.35fr) minmax(330px,.65fr)!important;
+  align-items:center!important;
+  gap:8vw!important;
+  padding:10vh 7vw 8vh!important;
+  transform:none!important;
+}
+#lobby-content>div:first-child{
+  align-items:flex-start!important;text-align:left!important;margin:0!important;max-width:760px!important;
+}
+#lobby-content>div:first-child p:first-child{
+  color:#d84b39!important;font-family:'Outfit',sans-serif!important;font-weight:800!important;letter-spacing:.25em!important;margin-bottom:18px!important;
+}
+#lobby-content h1{
+  font-family:'Noto Serif TC',serif!important;
+  font-size:clamp(72px,10vw,148px)!important;
+  line-height:.88!important;
+  text-align:left!important;
+  letter-spacing:-.06em!important;
+  margin:0 0 18px!important;
+  color:#f3efe5!important;
+  text-shadow:none!important;
+}
+#lobby-content .glitch-title::before,#lobby-content .glitch-title::after{display:none!important;}
+#lobby-content .elegant-line{margin:18px 0!important;width:120px!important;background:#d84b39!important;height:5px!important;}
+#lobby-content h2{
+  color:#c9c1b2!important;text-align:left!important;font-family:'Outfit',sans-serif!important;font-size:14px!important;letter-spacing:.24em!important;margin-left:0!important;
+}
+#lobby-content>div:nth-child(2){
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important;width:100%!important;max-width:440px!important;padding:20px!important;
+  background:rgba(243,239,229,.08)!important;border:1px solid rgba(243,239,229,.15)!important;border-radius:30px!important;backdrop-filter:blur(14px)!important;
+}
+#lobby-content>div:nth-child(2) .btn-elegant{
+  width:100%!important;text-align:left!important;padding:18px 22px!important;border-radius:16px!important;background:rgba(243,239,229,.92)!important;
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+}
+#lobby-content>div:nth-child(2) .btn-elegant:hover{background:#d84b39!important;color:white!important;transform:translateX(6px)!important;}
+#lobby-screen>.absolute.bottom-8{display:none!important;}
+
+/* Generic overlay screens now use a warm museum-paper atmosphere */
+.screen-overlay:not(#lobby-screen){
+  background:linear-gradient(135deg,rgba(17,17,17,.96),rgba(30,27,24,.94))!important;
+  backdrop-filter:blur(14px)!important;
+}
+#era-select-screen,#archive-screen,#tutorial-screen,#story-screen{
+  background:
+    linear-gradient(rgba(18,18,18,.94),rgba(18,18,18,.94)),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 1px,transparent 1px 80px)!important;
+}
+#era-select-screen h2,#archive-screen h2,#tutorial-screen h2,#story-screen h2{
+  font-family:'Noto Serif TC',serif!important;letter-spacing:-.02em!important;
+}
+
+/* Era selection cards — museum catalogue labels */
+.era-card.final-card{
+  border:0!important;border-radius:24px!important;background:#f2eee4!important;color:#171717!important;min-height:360px!important;
+  box-shadow:0 16px 40px rgba(0,0,0,.28)!important;overflow:hidden!important;
+}
+.era-card.final-card:hover{transform:translateY(-6px) rotate(-.4deg)!important;box-shadow:0 24px 52px rgba(0,0,0,.38)!important;}
+.era-card.final-card .era-art{opacity:.72!important;mix-blend-mode:multiply!important;filter:saturate(.75) contrast(.95)!important;}
+.era-card.final-card .relative{background:linear-gradient(180deg,transparent 0 25%,rgba(243,239,229,.86) 58%,#f3efe5 100%)!important;}
+.era-card.final-card h3,.era-card.final-card .text-white{color:#171717!important;}
+.era-card.final-card .text-gray-500,.era-card.final-card .text-gray-600{color:#645f56!important;}
+.era-card.final-card .border-white\/10{border-color:rgba(23,23,23,.14)!important;}
+.open-badge,.complete-badge{border-radius:999px!important;background:#171717!important;color:#f3efe5!important;border:0!important;}
+.complete-badge{background:#315c72!important;}
+
+/* HUD canvas layer */
+#ui-layer{
+  padding:0!important;
+  display:block!important;
+  font-family:'Outfit',sans-serif!important;
+}
+#ui-layer.hidden{display:none!important;}
+#ui-layer *{box-sizing:border-box;}
+
+/* top-center era ribbon */
+#era-hud{
+  position:absolute!important;top:16px!important;left:50%!important;transform:translateX(-50%)!important;
+  width:min(560px,calc(100vw - 620px))!important;min-width:360px!important;
+  padding:11px 14px 10px!important;border-radius:18px!important;
+  background:rgba(243,239,229,.92)!important;color:#171717!important;box-shadow:0 12px 32px rgba(0,0,0,.22)!important;
+  pointer-events:none!important;
+}
+#era-hud .text-gray-600,#era-hud .text-gray-400{color:#625d54!important;}
+#era-code{color:var(--era-accent)!important;font-size:9px!important;font-weight:800!important;}
+#era-name{color:#171717!important;font-family:'Noto Serif TC',serif!important;font-size:14px!important;font-weight:700!important;}
+#era-mechanic-text{color:#625d54!important;}
+#era-progress-track{height:5px!important;border-radius:999px!important;background:rgba(23,23,23,.12)!important;overflow:hidden!important;}
+#era-progress-fill{height:100%!important;border-radius:999px!important;background:var(--era-accent)!important;}
+#difficulty-hud{background:#171717!important;color:#f3efe5!important;border-radius:999px!important;padding:4px 8px!important;display:inline-block!important;}
+
+/* left player/status module */
+#style-hud{
+  position:absolute!important;left:18px!important;top:18px!important;width:278px!important;height:auto!important;
+  padding:16px 16px 14px 18px!important;border-radius:22px!important;background:rgba(19,19,19,.82)!important;color:#f3efe5!important;
+  border:1px solid rgba(255,255,255,.08)!important;box-shadow:0 16px 38px rgba(0,0,0,.32)!important;backdrop-filter:blur(16px)!important;
+}
+#style-hud #style-accent-line{width:7px!important;left:8px!important;top:12px!important;bottom:12px!important;border-radius:999px!important;}
+#style-hud .text-gray-400,#style-hud .text-gray-500{color:#a7a198!important;}
+#style-hud #current-style-name{font-size:26px!important;font-weight:800!important;letter-spacing:.01em!important;color:#f3efe5!important;}
+#style-hud .bg-black\/40{background:rgba(255,255,255,.06)!important;border:0!important;border-radius:999px!important;}
+#style-hud .bar-container-thin{height:8px!important;border-radius:999px!important;background:rgba(255,255,255,.08)!important;overflow:hidden!important;}
+#style-hud .bar-fill-thin{border-radius:999px!important;}
+#health-bar{background:#f3efe5!important;}
+#dash-bar{background:#60a5fa!important;}
+#hp-text{color:#f3efe5!important;}
+
+/* right telemetry module: score + funds + combo */
+#ui-layer>div.flex.justify-between.items-start.pointer-events-none{display:block!important;}
+#ui-layer>div.flex.justify-between.items-start.pointer-events-none>div.flex.flex-col.items-end{
+  position:absolute!important;right:18px!important;top:18px!important;width:250px!important;display:flex!important;gap:10px!important;align-items:stretch!important;
+}
+#ui-layer>div.flex.justify-between.items-start.pointer-events-none>div.flex.flex-col.items-end>.premium-glass{
+  margin:0!important;padding:12px 14px!important;background:rgba(243,239,229,.92)!important;border-radius:16px!important;color:#171717!important;
+}
+#coin-display{color:#171717!important;}
+#combo-display{width:100%!important;text-align:left!important;background:rgba(19,19,19,.82)!important;border-radius:18px!important;padding:11px 14px!important;box-shadow:0 14px 32px rgba(0,0,0,.26)!important;}
+#combo-display .text-\[\#d4af37\]{color:#f3efe5!important;}
+#combo-count-container{font-size:42px!important;color:#f3efe5!important;font-style:normal!important;line-height:1!important;}
+#combo-bar{background:var(--era-accent)!important;}
+#ui-layer>div.flex.justify-between.items-start.pointer-events-none>.premium-glass{
+  position:absolute!important;right:18px!important;top:154px!important;width:250px!important;padding:14px 16px!important;border-radius:18px!important;
+  background:rgba(243,239,229,.92)!important;color:#171717!important;text-align:left!important;
+}
+#ui-layer>div.flex.justify-between.items-start.pointer-events-none>.premium-glass .text-gray-400{color:#625d54!important;}
+#score{color:#171717!important;font-size:36px!important;font-weight:800!important;letter-spacing:-.04em!important;}
+#xp-bar{background:#d84b39!important;}
+
+/* bottom command dock */
+#active-skill-hud{
+  left:50%!important;bottom:18px!important;transform:translateX(-50%)!important;
+  gap:7px!important;padding:7px!important;border-radius:22px!important;
+  background:rgba(18,18,18,.82)!important;border:1px solid rgba(255,255,255,.08)!important;backdrop-filter:blur(16px)!important;
+  box-shadow:0 14px 40px rgba(0,0,0,.34)!important;
+}
+.skill-chip{
+  width:112px!important;min-height:58px!important;border:0!important;border-radius:16px!important;padding:8px 9px!important;
+  background:rgba(255,255,255,.07)!important;box-shadow:none!important;backdrop-filter:none!important;
+}
+.skill-chip.ready{background:rgba(243,239,229,.96)!important;}
+.skill-chip .key{
+  width:25px!important;height:25px!important;border-radius:50%!important;border:0!important;background:#171717!important;color:#f3efe5!important;
+  font-family:'Outfit',sans-serif!important;font-weight:900!important;
+}
+.skill-chip .name{font-family:'Outfit',sans-serif!important;font-size:10px!important;font-weight:800!important;letter-spacing:.03em!important;color:#f3efe5!important;}
+.skill-chip.ready .name{color:#171717!important;}
+.skill-chip .cd{font-family:'Outfit',sans-serif!important;font-size:8px!important;letter-spacing:.05em!important;color:#888!important;}
+.skill-chip .skill-bar{height:4px!important;border-radius:999px!important;overflow:hidden!important;background:rgba(255,255,255,.12)!important;}
+.skill-chip.ready .skill-bar{background:rgba(23,23,23,.12)!important;}
+.skill-chip .skill-fill{border-radius:999px!important;background:var(--era-accent)!important;}
+#buff-strip{bottom:88px!important;max-width:62vw!important;}
+.buff-pill{border:0!important;border-radius:999px!important;background:rgba(243,239,229,.9)!important;color:#171717!important;font-family:'Outfit',sans-serif!important;letter-spacing:.05em!important;box-shadow:0 8px 22px rgba(0,0,0,.2)!important;}
+.buff-pill strong{color:#d84b39!important;}
+#ui-layer>div.text-center.font-serif-tc{display:none!important;}
+
+/* style explanation becomes a compact curator note */
+#style-lens-panel{
+  right:18px!important;bottom:18px!important;top:auto!important;width:270px!important;padding:13px 14px!important;border:0!important;border-radius:18px!important;
+  background:rgba(243,239,229,.94)!important;color:#171717!important;box-shadow:0 14px 36px rgba(0,0,0,.26)!important;backdrop-filter:blur(16px)!important;
+}
+#style-lens-kicker{color:#8a8379!important;letter-spacing:.16em!important;}
+#style-lens-era{color:#171717!important;font-size:15px!important;}
+#style-lens-era-copy{color:#4c4943!important;font-size:10.5px!important;line-height:1.5!important;}
+#style-lens-style-copy{color:#315c72!important;font-size:10px!important;}
+#style-lens-style-badge{background:#171717!important;color:#f3efe5!important;border:0!important;}
+
+/* boss encounter = top red emergency strip */
+#boss-ui{
+  top:88px!important;width:min(620px,52vw)!important;max-width:none!important;
+  padding:10px 14px!important;border-radius:18px!important;background:rgba(55,14,14,.88)!important;box-shadow:0 16px 40px rgba(0,0,0,.34)!important;
+}
+#boss-name{color:#fff4ef!important;margin-bottom:6px!important;font-family:'Outfit',sans-serif!important;font-size:12px!important;letter-spacing:.16em!important;}
+#boss-ui .bar-container-thin{height:8px!important;border:0!important;border-radius:999px!important;background:rgba(255,255,255,.12)!important;}
+#boss-health-bar{border-radius:999px!important;background:#ff6b5d!important;}
+#boss-warning{top:110px!important;font-size:30px!important;color:#ff6b5d!important;text-shadow:none!important;letter-spacing:.08em!important;}
+#boss-warning span{font-family:'Outfit',sans-serif!important;font-size:12px!important;background:#ff6b5d!important;color:#171717!important;width:max-content!important;margin:0 auto 8px!important;padding:6px 12px!important;border-radius:999px!important;}
+
+/* Toasts */
+#achievement-toast{left:18px!important;bottom:18px!important;top:auto!important;right:auto!important;width:290px!important;border-radius:20px!important;background:#f3efe5!important;color:#171717!important;}
+#achievement-toast-title{color:#171717!important;}
+#achievement-toast-desc{color:#625d54!important;}
+#era-event-toast{right:18px!important;top:280px!important;width:260px!important;border-radius:18px!important;background:rgba(19,19,19,.86)!important;border:1px solid rgba(255,255,255,.08)!important;padding:12px 14px!important;}
+#era-event-text{font-size:15px!important;letter-spacing:.04em!important;}
+#artifact-indicator{border-radius:16px!important;background:#f3efe5!important;border:0!important;color:#171717!important;box-shadow:0 12px 30px rgba(0,0,0,.24)!important;}
+#artifact-indicator .artifact-name{color:#171717!important;font-family:'Outfit',sans-serif!important;}
+#artifact-indicator .artifact-distance{color:#756f65!important;}
+
+/* campaign progress = museum timeline rail */
+#campaign-progress{bottom:94px!important;width:min(520px,50vw)!important;}
+#campaign-progress>div{background:rgba(243,239,229,.90)!important;border-radius:999px!important;padding:7px 12px!important;box-shadow:0 10px 28px rgba(0,0,0,.22)!important;}
+#campaign-progress .text-gray-600{color:#625d54!important;}
+.mini-dot{width:10px!important;height:4px!important;border-radius:999px!important;background:rgba(23,23,23,.16)!important;}
+.mini-dot.done{background:#315c72!important;box-shadow:none!important;}
+.mini-dot.current{background:#d84b39!important;box-shadow:none!important;transform:scaleX(1.45)!important;}
+
+/* Pause / upgrade / shop / result */
+#pause-screen,#upgrade-screen,#shop-screen,#era-complete-screen,#game-over-screen{
+  background:rgba(18,18,18,.92)!important;backdrop-filter:blur(22px)!important;
+}
+#pause-screen::before,#upgrade-screen::before,#shop-screen::before,#era-complete-screen::before,#game-over-screen::before{
+  content:'';position:absolute;inset:18px;border:1px solid rgba(243,239,229,.14);pointer-events:none;
+}
+#pause-screen h2,#upgrade-screen h2,#shop-screen h2,#era-complete-screen h2,#game-over-screen h1{
+  font-family:'Noto Serif TC',serif!important;letter-spacing:-.03em!important;
+}
+#pause-screen h2{font-size:clamp(52px,8vw,92px)!important;}
+
+#upgrade-screen{align-items:stretch!important;padding:7vh 6vw!important;}
+#upgrade-screen>p,#upgrade-screen>h2{text-align:left!important;margin-left:max(0px,calc((100vw - 1160px)/2))!important;align-self:stretch!important;}
+#upgrade-screen>p{color:#d84b39!important;font-family:'Outfit',sans-serif!important;font-weight:800!important;letter-spacing:.16em!important;}
+#upgrade-screen>h2{font-size:clamp(40px,5vw,68px)!important;margin-bottom:36px!important;}
+#upgrade-container{display:grid!important;grid-template-columns:repeat(4,minmax(190px,1fr))!important;gap:14px!important;width:min(1160px,100%)!important;max-width:none!important;margin:0 auto!important;}
+.upgrade-card{
+  width:auto!important;aspect-ratio:auto!important;min-height:310px!important;border:0!important;border-radius:22px!important;background:#f3efe5!important;color:#171717!important;
+  box-shadow:0 18px 44px rgba(0,0,0,.24)!important;overflow:hidden!important;padding:22px!important;
+}
+.upgrade-card::before{display:none!important;}
+.upgrade-card:hover:not(.cursor-not-allowed){background:#fffaf0!important;color:#171717!important;transform:translateY(-7px)!important;box-shadow:0 26px 56px rgba(0,0,0,.34)!important;}
+.upgrade-card .text-white,.upgrade-card h3{color:#171717!important;}
+.upgrade-card .text-gray-400,.upgrade-card .text-gray-500{color:#665f56!important;}
+
+#shop-screen{align-items:flex-start!important;padding:7vh 7vw!important;overflow-y:auto!important;}
+#shop-screen>p{color:#60a5fa!important;font-family:'Outfit',sans-serif!important;font-weight:800!important;}
+#shop-screen>h2{font-size:clamp(48px,6vw,84px)!important;margin-bottom:14px!important;}
+#shop-screen>.font-cinzel{background:#f3efe5!important;color:#171717!important;border:0!important;border-radius:14px!important;margin-bottom:28px!important;}
+#shop-container{display:grid!important;grid-template-columns:repeat(3,minmax(220px,1fr))!important;width:min(1100px,100%)!important;gap:12px!important;}
+#shop-container>*{border-radius:20px!important;background:#f3efe5!important;color:#171717!important;border:0!important;box-shadow:0 14px 34px rgba(0,0,0,.22)!important;}
+#shop-screen>button{margin-top:28px!important;}
+
+.era-complete-panel{width:min(860px,88vw)!important;background:#f3efe5!important;color:#171717!important;border:0!important;border-radius:30px!important;padding:34px!important;box-shadow:0 28px 70px rgba(0,0,0,.38)!important;}
+.era-complete-panel #era-complete-title{color:#171717!important;}
+.era-complete-panel #era-complete-desc{color:#625d54!important;}
+.era-complete-panel .bg-white\/5{background:#ded7c8!important;border-radius:16px!important;}
+.era-complete-panel .text-white{color:#171717!important;}
+
+#game-over-screen h1{font-size:clamp(58px,8vw,100px)!important;margin-bottom:32px!important;}
+#final-score{color:#ff6b5d!important;}
+
+/* Audio control becomes a small utility capsule */
+#audio-controls{top:auto!important;right:auto!important;left:18px!important;bottom:18px!important;border:0!important;border-radius:999px!important;background:rgba(243,239,229,.9)!important;color:#171717!important;padding:8px 12px!important;opacity:.75!important;font-family:'Outfit',sans-serif!important;font-size:10px!important;box-shadow:0 8px 22px rgba(0,0,0,.2)!important;}
+#audio-controls:hover{opacity:1!important;}
+
+@media(max-width:1100px){
+  #era-hud{width:min(460px,calc(100vw - 430px))!important;min-width:320px!important;}
+  #style-hud{width:240px!important;}
+  #ui-layer>div.flex.justify-between.items-start.pointer-events-none>div.flex.flex-col.items-end,
+  #ui-layer>div.flex.justify-between.items-start.pointer-events-none>.premium-glass{width:210px!important;}
+  #upgrade-container{grid-template-columns:repeat(2,minmax(220px,1fr))!important;}
+  #shop-container{grid-template-columns:repeat(2,minmax(220px,1fr))!important;}
+  #style-lens-panel{display:none!important;}
+}
+@media(max-width:760px){
+  #lobby-content{grid-template-columns:1fr!important;gap:28px!important;padding:12vh 7vw 7vh!important;}
+  #lobby-content h1{font-size:clamp(60px,19vw,92px)!important;}
+  #lobby-content>div:nth-child(2){max-width:none!important;}
+  #era-hud{top:10px!important;width:calc(100vw - 20px)!important;min-width:0!important;}
+  #style-hud{left:10px!important;top:auto!important;bottom:94px!important;width:220px!important;padding:12px!important;transform:none!important;}
+  #style-hud #current-style-name{font-size:20px!important;}
+  #ui-layer>div.flex.justify-between.items-start.pointer-events-none>div.flex.flex-col.items-end{right:10px!important;top:78px!important;width:160px!important;}
+  #ui-layer>div.flex.justify-between.items-start.pointer-events-none>.premium-glass{right:10px!important;top:176px!important;width:160px!important;}
+  #score{font-size:28px!important;}
+  #active-skill-hud{bottom:10px!important;max-width:calc(100vw - 20px)!important;overflow:hidden!important;}
+  .skill-chip{width:76px!important;min-height:52px!important;padding:6px!important;}
+  .skill-chip .cd{display:none!important;}.skill-chip .name{font-size:8px!important;}
+  #buff-strip{bottom:72px!important;max-width:80vw!important;}
+  #campaign-progress{display:none!important;}
+  #upgrade-container,#shop-container{grid-template-columns:1fr!important;}
+  #upgrade-screen,#shop-screen{padding:6vh 5vw!important;overflow-y:auto!important;}
+}
+
 </style>
 </head>
 <body>
@@ -225,17 +561,17 @@
     <div id="lobby-screen" class="screen-overlay interactive overflow-hidden">
         <div id="lobby-content" class="w-full h-full flex flex-col items-center justify-center transition-transform duration-100 ease-out relative z-10">
             <div class="text-center mb-16 relative flex flex-col items-center">
-                <p class="font-serif-tc text-gray-500 tracking-[0.4em] text-sm mb-6 uppercase">絕對美術館</p>
+                <p class="font-serif-tc text-gray-500 tracking-[0.4em] text-sm mb-6 uppercase">FIELD CONSOLE / 絕對美術館</p>
                 <h1 class="text-7xl md:text-8xl font-serif-tc font-light tracking-[0.1em] text-white mb-4 drop-shadow-2xl glitch-title" data-text="失序美學">失序美學</h1>
                 <div class="elegant-line my-6"></div>
-                <h2 class="text-xl md:text-2xl font-serif-tc font-medium tracking-[0.6em] text-[#d4af37] opacity-90 uppercase ml-[0.6em] drop-shadow-lg">時代迴廊 · 狂氣策展人</h2>
+                <h2 class="text-xl md:text-2xl font-serif-tc font-medium tracking-[0.6em] text-[#d4af37] opacity-90 uppercase ml-[0.6em] drop-shadow-lg">MUSEUM FIELD OPERATION · 時代迴廊</h2>
             </div>
             <div class="flex flex-wrap justify-center gap-4 z-10 w-full px-4 max-w-5xl">
-                <button onclick="startCampaign()" class="btn-elegant px-8 py-4 font-serif-tc font-semibold rounded-sm text-base md:text-lg tracking-[0.2em] uppercase whitespace-nowrap">開始時代遠征</button>
-                <button onclick="showEraSelect()" class="btn-elegant px-8 py-4 font-serif-tc font-semibold rounded-sm text-base md:text-lg tracking-[0.2em] uppercase whitespace-nowrap">自由選擇年代</button>
-                <button onclick="showArchive()" class="btn-elegant px-8 py-4 font-serif-tc font-semibold rounded-sm text-base md:text-lg tracking-[0.2em] uppercase whitespace-nowrap">館藏圖鑑</button>
-                <button onclick="showTutorial()" class="btn-elegant px-8 py-4 font-serif-tc font-semibold rounded-sm text-base md:text-lg tracking-[0.2em] uppercase whitespace-nowrap">策展指南</button>
-                <button onclick="showStory()" class="btn-elegant px-8 py-4 font-serif-tc font-semibold rounded-sm text-base md:text-lg tracking-[0.2em] uppercase whitespace-nowrap">故事背景</button>
+                <button onclick="startCampaign()" class="btn-elegant px-8 py-4 font-serif-tc font-semibold rounded-sm text-base md:text-lg tracking-[0.2em] uppercase whitespace-nowrap">進入策展任務</button>
+                <button onclick="showEraSelect()" class="btn-elegant px-8 py-4 font-serif-tc font-semibold rounded-sm text-base md:text-lg tracking-[0.2em] uppercase whitespace-nowrap">開啟年代索引</button>
+                <button onclick="showArchive()" class="btn-elegant px-8 py-4 font-serif-tc font-semibold rounded-sm text-base md:text-lg tracking-[0.2em] uppercase whitespace-nowrap">館藏資料庫</button>
+                <button onclick="showTutorial()" class="btn-elegant px-8 py-4 font-serif-tc font-semibold rounded-sm text-base md:text-lg tracking-[0.2em] uppercase whitespace-nowrap">操作手冊</button>
+                <button onclick="showStory()" class="btn-elegant px-8 py-4 font-serif-tc font-semibold rounded-sm text-base md:text-lg tracking-[0.2em] uppercase whitespace-nowrap">檔案紀錄</button>
             </div>
         </div>
 
