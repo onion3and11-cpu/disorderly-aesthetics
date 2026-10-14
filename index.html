@@ -4,7 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>失序美學：時代迴廊 FINAL - 跨越藝術史</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com">
+/* Stop browser selection/drag gestures from interfering with gameplay. */
+document.addEventListener('selectstart', (e) => {
+    const t=e.target;
+    if(t && t.closest && t.closest('input, textarea, [contenteditable="true"]')) return;
+    e.preventDefault();
+});
+document.addEventListener('dragstart', (e) => {
+    const t=e.target;
+    if(t && t.closest && t.closest('input, textarea, [contenteditable="true"]')) return;
+    e.preventDefault();
+});
+
+</script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Noto+Serif+TC:wght@300;400;600;900&family=Outfit:wght@200;300;400;600;800;900&display=swap');
 
@@ -744,6 +757,38 @@ body{font-family:'Outfit','Noto Sans TC',system-ui,sans-serif;}
 .endless-entry{position:relative!important;background:#171717!important;color:#f3efe5!important;border:1px solid rgba(243,239,229,.22)!important;}
 .endless-entry span{display:inline-grid;place-items:center;width:28px;height:28px;margin-right:10px;border-radius:50%;background:#b91c1c;color:#fff;font-size:20px;line-height:1;}
 .endless-entry:hover{background:#b91c1c!important;color:#fff!important;}
+
+
+/* ===== Prevent accidental text selection during gameplay ===== */
+html, body, canvas, button,
+#ui-layer,
+#lobby-screen,
+#story-screen,
+#tutorial-screen,
+#era-select-screen,
+#archive-screen,
+#pause-screen,
+#upgrade-screen,
+#shop-screen,
+#era-complete-screen,
+#game-over-screen,
+#achievement-toast,
+#era-event-toast,
+#chapter-toast,
+#artifact-indicator,
+#style-lens-panel {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+input, textarea, [contenteditable="true"] {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+img, canvas {
+  -webkit-user-drag: none !important;
+  user-drag: none !important;
+}
 
 </style>
 </head>
