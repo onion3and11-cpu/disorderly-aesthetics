@@ -1508,9 +1508,9 @@ function useActiveSkill(id){
    for(let i=0;i<18;i++){const a=i/18*Math.PI*2;projectiles.push(new Projectile(player.x,player.y,a,11,20*player.stats.damageMult*combatDamageMult(),7*player.stats.projSizeMult,player.style,player.stats.pierce+1+extraPierceBuff(),105));}
    createParticles(player.x,player.y,player.style.color,40,0,360);applyCameraShake(14);showEraEvent('色彩爆裂：全向筆觸釋放','ACTIVE SKILL');
  }else if(id==='freeze'){
-   state.freezeTimer=Math.max(state.freezeTimer,180);createParticles(player.x,player.y,'#93c5fd',32,0,360);showEraEvent('凝時畫框：敵人與彈幕暫停','ACTIVE SKILL');
+   state.freezeTimer=Math.max(state.freezeTimer,180);createParticles(player.x,player.y,'#93c5fd',32,0,360);showEraEvent('凝時畫框：敵人與彈幕暫停 3 秒','ACTIVE SKILL');
  }else if(id==='restore'){
-   player.heal(Math.max(20,player.maxHp*.18));player.shield=Math.min(player.stats.shieldMax||100,player.shield+25);state.restoreInvuln=60;createParticles(player.x,player.y,'#34d399',45,0,360);showEraEvent('修復領域：治療、護盾、短暫無敵','ACTIVE SKILL');
+   player.heal(Math.max(20,player.maxHp*.18));player.shield=Math.min(player.stats.shieldMax||100,player.shield+25);state.restoreInvuln=60;createParticles(player.x,player.y,'#34d399',45,0,360);showEraEvent('修復領域：中量治療、護盾、短暫無敵','ACTIVE SKILL');
    if(player.shield>=100)unlockAchievement('shield100');
  }else if(id==='rift'){
    const wx=state.mouse.x+state.camera.x,wy=state.mouse.y+state.camera.y,dx=wx-player.x,dy=wy-player.y,len=Math.hypot(dx,dy)||1,dist=Math.min(330,len);player.x+=dx/len*dist;player.y+=dy/len*dist;player.x=Math.max(-WORLD_SIZE/2+player.radius,Math.min(WORLD_SIZE/2-player.radius,player.x));player.y=Math.max(-WORLD_SIZE/2+player.radius,Math.min(WORLD_SIZE/2-player.radius,player.y));
@@ -1593,12 +1593,12 @@ function spawnEndlessBoss(){
     const df=diffCfg();
     const b=new Enemy(ex,ey,4,PIGMENTS.BOSS);
     const minutes=Math.max(0,(state.playElapsedMs||0)/60000);
-    const pressure=1+(state.endlessBossCount||0)*.20+minutes*.075;
+    const pressure=1+(state.endlessBossCount||0)*.14+minutes*.055;
     b.radius=64+cfg.index*2;
     b.speed=(.58+cfg.index*.015)*Math.min(1.75,1+minutes*.025+(state.endlessBossCount||0)*.018);
     b.maxHp=Math.round((1450+cfg.index*250)*df.enemyHp*pressure);
     b.hp=b.maxHp;
-    b.damage=(24+cfg.index*1.8)*df.enemyDmg*Math.min(2.7,1+(state.endlessBossCount||0)*.07+minutes*.035);
+    b.damage=(24+cfg.index*1.8)*df.enemyDmg*Math.min(2.25,1+(state.endlessBossCount||0)*.05+minutes*.028);
     b.vertices=10+cfg.index%4;
     b.color=cfg.accent;
     b.eraId=eraId;
@@ -1830,10 +1830,10 @@ function updateUltimateEffect(){if(!state.ultimateActive)return;state.ultimatePu
 
 const SHOP_ITEMS = [
     { name: "結構修補", en: "STRUCTURAL REPAIR", desc: "恢復 50 點結構完整度", price: 50, apply: (p) => p.heal(50), color: '#34d399' },
-    { name: "擴充畫布", en: "CANVAS EXPANSION", desc: "最大結構 +20，並補滿", price: 120, apply: (p) => { p.maxHp += 20; p.heal(p.maxHp); }, color: '#10b981' },
-    { name: "極速靈感", en: "HASTE INSPIRATION", desc: "移動速度 +10%", price: 150, apply: (p) => p.stats.speedMult += 0.1, color: '#8b5cf6' },
-    { name: "靈感藥劑", en: "ULTIMATE STIMULANT", desc: "破框大絕能量增加 50%", price: 80, apply: (p) => addUltimateCharge(50), color: '#f472b6' },
-    { name: "名畫碎片", en: "MASTERPIECE SHARD", desc: "所有畫派傷害 +15%", price: 200, apply: (p) => p.stats.damageMult += 0.15, color: '#ef4444' }
+    { name: "擴充畫布", en: "CANVAS EXPANSION", desc: "最大結構 +15，並恢復 35 HP", price: 125, apply: (p) => { p.maxHp=Math.min(190,p.maxHp+15);p.heal(35); }, color: '#10b981' },
+    { name: "極速靈感", en: "HASTE INSPIRATION", desc: "移動速度 +10%（有上限）", price: 140, apply: (p) => p.stats.speedMult=Math.min(1.8,p.stats.speedMult+.10), color: '#8b5cf6' },
+    { name: "靈感藥劑", en: "ULTIMATE STIMULANT", desc: "破框大絕能量增加 40%", price: 85, apply: (p) => addUltimateCharge(40), color: '#f472b6' },
+    { name: "名畫碎片", en: "MASTERPIECE SHARD", desc: "所有畫派傷害 +12%（有上限）", price: 210, apply: (p) => p.stats.damageMult=Math.min(2.5,p.stats.damageMult+.12), color: '#ef4444' }
 ];
 
 function toggleShop() {
@@ -2779,7 +2779,7 @@ function createParticles(x, y, color, count, baseAngle, spread) {
 }
 
 function spawnEnemy(){const cfg=eraCfg(),df=diffCfg();const maxEnemies=Math.round((16+Math.min(state.level*3,28)+Math.floor(cfg.index/2))*df.spawn);
- if(state.endlessMode){const minutes=Math.max(0,(state.playElapsedMs||0)/60000);const endlessMax=Math.round((20+Math.min(state.level*3,34)+Math.min(26,minutes*2.2))*df.spawn);if(enemies.length>=endlessMax)return;if(Math.random()<(.05+Math.min(state.level,10)*.004+Math.min(.045,minutes*.0025))*df.spawn){let ex,ey;if(Math.random()<.5){ex=state.camera.x+(Math.random()<.5?-90:canvas.width+90);ey=state.camera.y+Math.random()*canvas.height;}else{ex=state.camera.x+Math.random()*canvas.width;ey=state.camera.y+(Math.random()<.5?-90:canvas.height+90);}ex=Math.max(-WORLD_SIZE/2+50,Math.min(WORLD_SIZE/2-50,ex));ey=Math.max(-WORLD_SIZE/2+50,Math.min(WORLD_SIZE/2-50,ey));const r=Math.random(),type=r<.38?0:(r<.60?2:(r<.82?3:1));const pTypes=['BLUE','RED','YELLOW','PURPLE','GREEN'];const pigment=PIGMENTS[pTypes[Math.floor(Math.random()*pTypes.length)]];const e=applyEraEnemyProfile(new Enemy(ex,ey,type,pigment));const pressure=1+Math.min(1.5,minutes*.035+(state.endlessBossCount||0)*.025);e.maxHp=Math.round(e.maxHp*pressure);e.hp=e.maxHp;e.damage*=Math.min(2.3,1+minutes*.02+(state.endlessBossCount||0)*.018);enemies.push(e);}return;}
+ if(state.endlessMode){const minutes=Math.max(0,(state.playElapsedMs||0)/60000);const endlessMax=Math.round((20+Math.min(state.level*3,34)+Math.min(26,minutes*2.2))*df.spawn);if(enemies.length>=endlessMax)return;if(Math.random()<(.05+Math.min(state.level,10)*.004+Math.min(.045,minutes*.0025))*df.spawn){let ex,ey;if(Math.random()<.5){ex=state.camera.x+(Math.random()<.5?-90:canvas.width+90);ey=state.camera.y+Math.random()*canvas.height;}else{ex=state.camera.x+Math.random()*canvas.width;ey=state.camera.y+(Math.random()<.5?-90:canvas.height+90);}ex=Math.max(-WORLD_SIZE/2+50,Math.min(WORLD_SIZE/2-50,ex));ey=Math.max(-WORLD_SIZE/2+50,Math.min(WORLD_SIZE/2-50,ey));const r=Math.random(),type=r<.38?0:(r<.60?2:(r<.82?3:1));const pTypes=['BLUE','RED','YELLOW','PURPLE','GREEN'];const pigment=PIGMENTS[pTypes[Math.floor(Math.random()*pTypes.length)]];const e=applyEraEnemyProfile(new Enemy(ex,ey,type,pigment));const pressure=1+Math.min(1.25,minutes*.028+(state.endlessBossCount||0)*.020);e.maxHp=Math.round(e.maxHp*pressure);e.hp=e.maxHp;e.damage*=Math.min(2.0,1+minutes*.016+(state.endlessBossCount||0)*.014);enemies.push(e);}return;}
  if(state.eraKills>=state.eraTarget&&!state.eraBossSpawned){state.eraBossSpawned=true;let ex=player.x+(Math.random()<.5?-650:650),ey=player.y+(Math.random()<.5?-430:430);ex=Math.max(-WORLD_SIZE/2+120,Math.min(WORLD_SIZE/2-120,ex));ey=Math.max(-WORLD_SIZE/2+120,Math.min(WORLD_SIZE/2-120,ey));let b=applyEraEnemyProfile(new Enemy(ex,ey,4,PIGMENTS.BOSS),true);enemies.push(b);state.activeBoss=b;state.bossDamageSnapshot=state.damageTaken;bossNameEl.innerText=`${cfg.boss} · ${cfg.bossEn}`;bossNameEl.style.color=cfg.accent;bossWarningEl.innerHTML=`<span class="block text-2xl font-serif-tc mb-2" style="color:${cfg.accent}">${cfg.name}的核心作品正在失控</span>WARNING: ${cfg.bossEn} AWAKENED`;bossWarningEl.classList.add('warning-flash');SoundManager.playBossWarning();setTimeout(()=>bossWarningEl.classList.remove('warning-flash'),3000);bossUiEl.classList.remove('hidden');setTimeout(()=>bossUiEl.classList.remove('opacity-0'),100);showEraEvent(`失控巨作《${cfg.boss}》甦醒`,'MASTERPIECE ANOMALY');updateEraProgress();return;}
  if(enemies.length>=maxEnemies)return;
  if(!state.eraBossSpawned&&Math.random()<(.044+Math.min(state.level,8)*.004+cfg.index*.001)*df.spawn){let ex,ey;if(Math.random()<.5){ex=state.camera.x+(Math.random()<.5?-85:canvas.width+85);ey=state.camera.y+Math.random()*canvas.height;}else{ex=state.camera.x+Math.random()*canvas.width;ey=state.camera.y+(Math.random()<.5?-85:canvas.height+85);}ex=Math.max(-WORLD_SIZE/2+50,Math.min(WORLD_SIZE/2-50,ex));ey=Math.max(-WORLD_SIZE/2+50,Math.min(WORLD_SIZE/2-50,ey));const r=Math.random(),type=r<.4?0:(r<.61?2:(r<.81?3:1));const pTypes=['BLUE','RED','YELLOW','PURPLE','GREEN'];const pigment=PIGMENTS[pTypes[Math.floor(Math.random()*pTypes.length)]];enemies.push(applyEraEnemyProfile(new Enemy(ex,ey,type,pigment)));}}
@@ -2838,38 +2838,38 @@ function levelUp() {
     setTimeout(() => damageVignette.style.boxShadow = "inset 0 0 150px rgba(185, 28, 28, 0)", 300);
 
     const RELIC_POOL = [
-        {name:'印象派速寫',en:'RAPID SKETCH',desc:'所有畫派攻擊速度 +20%',apply:p=>p.stats.fireRateMult+=.2,color:STYLES.IMPRESSIONISM.color},
-        {name:'野獸派狂氣',en:'FERAL INSTINCT',desc:'所有畫派傷害 +25%',apply:p=>p.stats.damageMult+=.25,color:STYLES.FAUVISM.color},
-        {name:'普普量產',en:'MASS REPRODUCTION',desc:'子彈穿透次數 +1',apply:p=>p.stats.pierce+=1,color:STYLES.POPART.color},
-        {name:'空間重構',en:'SPATIAL RECONSTRUCT',desc:'閃避冷卻時間 -20%',apply:p=>p.maxDashCooldown=Math.max(28,Math.floor(p.maxDashCooldown*.8)),color:'#a78bfa'},
-        {name:'巨幅畫作',en:'GRAND CANVAS',desc:'筆觸體積 +30%',apply:p=>p.stats.projSizeMult+=.3,color:'#f472b6'},
-        {name:'點描派詭雷',en:'POINTILLISM MINE',desc:'閃避時沿路留下顏料炸彈',apply:p=>p.stats.dashMines=true,color:'#facc15'},
-        {name:'超現實迴避',en:'SURREAL EVASION',desc:'受傷時 15% 機率完全迴避',apply:p=>p.stats.surrealEvasion=true,color:'#86efac'},
-        {name:'星夜螺旋',en:'STARRY ORBIT',desc:'增加一顆環繞攻擊靈感球',apply:p=>p.stats.orbitals+=1,color:'#3b82f6'},
-        {name:'吸血厚塗',en:'VAMPIRIC STROKE',desc:'攻擊有機率吸色回復 HP',apply:p=>p.stats.lifesteal=true,color:'#9d174d'},
-        {name:'鑑賞家的眼睛',en:'CRITICAL EYE',desc:'暴擊率 +8%、暴擊倍率 +0.25',apply:p=>{p.stats.critChance+=.08;p.stats.critMult+=.25},color:'#fb7185'},
-        {name:'巨作解剖學',en:'BOSS ANATOMY',desc:'對 Boss 傷害 +30%',apply:p=>p.stats.bossDamageMult+=.3,color:'#ef4444'},
-        {name:'快速策展',en:'QUICK CURATION',desc:'所有主動技能冷卻 -12%',apply:p=>p.stats.skillCooldownMult=Math.max(.5,p.stats.skillCooldownMult-.12),color:'#22d3ee'},
-        {name:'殘色回收',en:'COLOR RECLAIM',desc:'每次擊殺回復 1.5 HP',apply:p=>p.stats.killHeal+=1.5,color:'#34d399'},
-        {name:'鎏金保護層',en:'GILDED GUARD',desc:'擊殺獲得 2 護盾，護盾上限 +30',apply:p=>{p.stats.killShield+=2;p.stats.shieldMax+=30},color:'#fbbf24'},
-        {name:'自我修復畫布',en:'SELF RESTORATION',desc:'每秒恢復 0.7 HP',apply:p=>p.stats.regen+=.7,color:'#6ee7b7'},
-        {name:'厚重底料',en:'HEAVY GESSO',desc:'受到的傷害 -12%',apply:p=>p.stats.defenseMult*=.88,color:'#d1d5db'},
-        {name:'速讀藝術史',en:'FAST STUDY',desc:'靈感經驗獲得 +30%',apply:p=>p.stats.xpMult+=.3,color:'#a7f3d0'},
-        {name:'投資名作',en:'ART INVESTOR',desc:'金幣價值 +35%',apply:p=>p.stats.coinMult+=.35,color:'#fde047'},
-        {name:'評論家加筆',en:'CRITIC BONUS',desc:'藝術評價取得 +25%',apply:p=>p.stats.scoreMult+=.25,color:'#e5e7eb'},
-        {name:'館藏磁場',en:'COLLECTION FIELD',desc:'拾取範圍 +65',apply:p=>p.stats.pickupRadius+=65,color:'#f0abfc'},
-        {name:'長效媒材',en:'LASTING MEDIUM',desc:'特殊道具的限時效果 +35%',apply:p=>p.stats.itemDurationMult+=.35,color:'#67e8f9'},
-        {name:'奇物嗅覺',en:'ARTIFACT SENSE',desc:'地圖特殊道具出現速度 +30%',apply:p=>p.stats.itemSpawnRate+=.3,color:'#f9a8d4'},
-        {name:'終結筆勢',en:'FINAL STROKE',desc:'一般敵人低於 12% HP 時直接處決',apply:p=>p.stats.executeThreshold=Math.max(p.stats.executeThreshold,.12),color:'#dc2626'},
-        {name:'爆裂顏料',en:'DEATH SPLASH',desc:'敵人死亡時對附近造成 18 傷害',apply:p=>p.stats.explosionOnKill+=18,color:'#f97316'},
-        {name:'靈感回流',en:'ULTIMATE FLOW',desc:'大絕能量取得 +35%',apply:p=>p.stats.ultimateGainMult+=.35,color:'#f472b6'},
-        {name:'延長心流',en:'FLOW STATE',desc:'Combo 維持時間 +45%',apply:p=>state.maxComboTimer=Math.floor(state.maxComboTimer*1.45),color:'#d4af37'},
-        {name:'反擊裝置',en:'THORN FRAME',desc:'受傷時對 150 範圍敵人反傷 20',apply:p=>p.stats.thorns=(p.stats.thorns||0)+20,color:'#c084fc'},
-        {name:'生命擴框',en:'VITAL CANVAS',desc:'最大 HP +25 並立即回滿 25',apply:p=>{p.maxHp+=25;p.heal(25)},color:'#10b981'},
-        {name:'稜鏡彈道',en:'PRISMATIC PATH',desc:'額外穿透 +2、投射物尺寸 +10%',apply:p=>{p.stats.pierce+=2;p.stats.projSizeMult+=.1},color:'#60a5fa'},
-        {name:'策展人捷徑',en:'CURATOR SHORTCUT',desc:'移動速度 +16%',apply:p=>p.stats.speedMult+=.16,color:'#93c5fd'},
-        {name:'精煉顏料',en:'REFINED PIGMENT',desc:'傷害 +12%、攻速 +10%',apply:p=>{p.stats.damageMult+=.12;p.stats.fireRateMult+=.1},color:'#fca5a5'},
-        {name:'安全裝裱',en:'SAFE FRAMING',desc:'立刻獲得 35 護盾',apply:p=>{p.shield=Math.min(p.stats.shieldMax,p.shield+35)},color:'#fcd34d'}
+        {name:'印象派速寫',en:'RAPID SKETCH',desc:'所有畫派攻擊速度 +15%（有上限）',apply:p=>p.stats.fireRateMult=Math.min(2.05,p.stats.fireRateMult+.15),color:STYLES.IMPRESSIONISM.color},
+        {name:'野獸派狂氣',en:'FERAL INSTINCT',desc:'所有畫派傷害 +18%（有上限）',apply:p=>p.stats.damageMult=Math.min(2.5,p.stats.damageMult+.18),color:STYLES.FAUVISM.color},
+        {name:'普普量產',en:'MASS REPRODUCTION',desc:'子彈穿透 +1、筆觸尺寸 +8%',apply:p=>{p.stats.pierce=Math.min(8,p.stats.pierce+1);p.stats.projSizeMult=Math.min(2,p.stats.projSizeMult+.08)},color:STYLES.POPART.color},
+        {name:'空間重構',en:'SPATIAL RECONSTRUCT',desc:'閃避冷卻 -15%（最低 36）',apply:p=>p.maxDashCooldown=Math.max(36,Math.floor(p.maxDashCooldown*.85)),color:'#a78bfa'},
+        {name:'巨幅畫作',en:'GRAND CANVAS',desc:'筆觸體積 +20%、傷害 +6%',apply:p=>{p.stats.projSizeMult=Math.min(2,p.stats.projSizeMult+.2);p.stats.damageMult=Math.min(2.5,p.stats.damageMult+.06)},color:'#f472b6'},
+        {name:'點描派詭雷',en:'POINTILLISM MINE',desc:'閃避留下詭雷；重複取得可提升傷害',apply:p=>{p.stats.dashMines=true;p.stats.dashMineDamage=Math.min(38,(p.stats.dashMineDamage||0)+18)},color:'#facc15'},
+        {name:'超現實迴避',en:'SURREAL EVASION',desc:'迴避率 +7%（最高 22%）',apply:p=>{p.stats.surrealEvasion=true;p.stats.evasionChance=Math.min(.22,(p.stats.evasionChance||0)+.07)},color:'#86efac'},
+        {name:'星夜螺旋',en:'STARRY ORBIT',desc:'增加一顆環繞靈感球（最多 4 顆）',apply:p=>p.stats.orbitals=Math.min(4,p.stats.orbitals+1),color:'#3b82f6'},
+        {name:'吸血厚塗',en:'VAMPIRIC STROKE',desc:'吸色觸發率 +2.5%（最高 8%）',apply:p=>{p.stats.lifesteal=true;p.stats.lifestealChance=Math.min(.08,(p.stats.lifestealChance||0)+.025)},color:'#9d174d'},
+        {name:'鑑賞家的眼睛',en:'CRITICAL EYE',desc:'暴擊率 +6%、暴擊倍率 +0.20',apply:p=>{p.stats.critChance=Math.min(.35,p.stats.critChance+.06);p.stats.critMult=Math.min(2.35,p.stats.critMult+.20)},color:'#fb7185'},
+        {name:'巨作解剖學',en:'BOSS ANATOMY',desc:'對 Boss 傷害 +22%（最高 +75%）',apply:p=>p.stats.bossDamageMult=Math.min(1.75,p.stats.bossDamageMult+.22),color:'#ef4444'},
+        {name:'快速策展',en:'QUICK CURATION',desc:'主動技能冷卻 -10%（最低 65%）',apply:p=>p.stats.skillCooldownMult=Math.max(.65,p.stats.skillCooldownMult-.10),color:'#22d3ee'},
+        {name:'殘色回收',en:'COLOR RECLAIM',desc:'每次擊殺回復 0.8 HP（最高 2.4）',apply:p=>p.stats.killHeal=Math.min(2.4,p.stats.killHeal+.8),color:'#34d399'},
+        {name:'鎏金保護層',en:'GILDED GUARD',desc:'擊殺獲得 1.5 護盾，護盾上限 +20',apply:p=>{p.stats.killShield=Math.min(4.5,p.stats.killShield+1.5);p.stats.shieldMax=Math.min(180,p.stats.shieldMax+20)},color:'#fbbf24'},
+        {name:'自我修復畫布',en:'SELF RESTORATION',desc:'每秒恢復 0.35 HP（最高 1.2）',apply:p=>p.stats.regen=Math.min(1.2,p.stats.regen+.35),color:'#6ee7b7'},
+        {name:'厚重底料',en:'HEAVY GESSO',desc:'受到傷害 -10%（最低承受 65%）',apply:p=>p.stats.defenseMult=Math.max(.65,p.stats.defenseMult*.90),color:'#d1d5db'},
+        {name:'速讀藝術史',en:'FAST STUDY',desc:'靈感經驗獲得 +25%（最高 ×2）',apply:p=>p.stats.xpMult=Math.min(2,p.stats.xpMult+.25),color:'#a7f3d0'},
+        {name:'投資名作',en:'ART INVESTOR',desc:'金幣價值 +25%（最高 ×2）',apply:p=>p.stats.coinMult=Math.min(2,p.stats.coinMult+.25),color:'#fde047'},
+        {name:'評論家加筆',en:'CRITIC BONUS',desc:'藝術評價取得 +20%（最高 ×2）',apply:p=>p.stats.scoreMult=Math.min(2,p.stats.scoreMult+.20),color:'#e5e7eb'},
+        {name:'館藏磁場',en:'COLLECTION FIELD',desc:'拾取範圍 +90（最高 +270）',apply:p=>p.stats.pickupRadius=Math.min(270,p.stats.pickupRadius+90),color:'#f0abfc'},
+        {name:'長效媒材',en:'LASTING MEDIUM',desc:'奇物限時效果 +25%（最高 +75%）',apply:p=>p.stats.itemDurationMult=Math.min(1.75,p.stats.itemDurationMult+.25),color:'#67e8f9'},
+        {name:'奇物嗅覺',en:'ARTIFACT SENSE',desc:'特殊道具出現速度 +25%（最高 +75%）',apply:p=>p.stats.itemSpawnRate=Math.min(1.75,p.stats.itemSpawnRate+.25),color:'#f9a8d4'},
+        {name:'終結筆勢',en:'FINAL STROKE',desc:'一般敵人處決線 +4%（最高 16%）',apply:p=>p.stats.executeThreshold=Math.min(.16,p.stats.executeThreshold+.04),color:'#dc2626'},
+        {name:'爆裂顏料',en:'DEATH SPLASH',desc:'敵人死亡時附近傷害 +24（最高 72）',apply:p=>p.stats.explosionOnKill=Math.min(72,p.stats.explosionOnKill+24),color:'#f97316'},
+        {name:'靈感回流',en:'ULTIMATE FLOW',desc:'大絕能量取得 +25%（最高 ×2）',apply:p=>p.stats.ultimateGainMult=Math.min(2,p.stats.ultimateGainMult+.25),color:'#f472b6'},
+        {name:'延長心流',en:'FLOW STATE',desc:'Combo 維持時間 +30%（最高 6 秒）',apply:p=>state.maxComboTimer=Math.min(360,Math.floor(state.maxComboTimer*1.3)),color:'#d4af37'},
+        {name:'反擊裝置',en:'THORN FRAME',desc:'受傷時反傷 +20（最高 60）',apply:p=>p.stats.thorns=Math.min(60,(p.stats.thorns||0)+20),color:'#c084fc'},
+        {name:'生命擴框',en:'VITAL CANVAS',desc:'最大 HP +20，並立即恢復 20',apply:p=>{p.maxHp=Math.min(190,p.maxHp+20);p.heal(20)},color:'#10b981'},
+        {name:'稜鏡彈道',en:'PRISMATIC PATH',desc:'額外穿透 +1、投射物尺寸 +15%',apply:p=>{p.stats.pierce=Math.min(8,p.stats.pierce+1);p.stats.projSizeMult=Math.min(2,p.stats.projSizeMult+.15)},color:'#60a5fa'},
+        {name:'策展人捷徑',en:'CURATOR SHORTCUT',desc:'移動速度 +12%（最高 +80%）',apply:p=>p.stats.speedMult=Math.min(1.8,p.stats.speedMult+.12),color:'#93c5fd'},
+        {name:'精煉顏料',en:'REFINED PIGMENT',desc:'傷害 +10%、攻速 +8%',apply:p=>{p.stats.damageMult=Math.min(2.5,p.stats.damageMult+.10);p.stats.fireRateMult=Math.min(2.05,p.stats.fireRateMult+.08)},color:'#fca5a5'},
+        {name:'安全裝裱',en:'SAFE FRAMING',desc:'立刻獲得 30 護盾',apply:p=>{p.shield=Math.min(p.stats.shieldMax,p.shield+30)},color:'#fcd34d'}
     ];
 
     let shuffled = [...RELIC_POOL].sort(() => 0.5 - Math.random());
