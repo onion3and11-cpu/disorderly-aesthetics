@@ -1045,6 +1045,55 @@ img, canvas {
  .manual-skill-rows>div{grid-template-columns:24px 56px 1fr;padding:3px 0}.manual-rule-block{padding:5px 6px;margin-bottom:4px}
 }
 
+
+/* ===== Scrollable full-page overlays must start at the top ===== */
+#era-select-screen,
+#archive-screen{
+  justify-content:flex-start !important;
+  align-items:center !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  padding-top:34px !important;
+  padding-bottom:52px !important;
+  overscroll-behavior:contain;
+  scroll-padding-top:34px;
+}
+
+#era-select-screen > div,
+#archive-screen > div{
+  flex:0 0 auto !important;
+  margin-top:0 !important;
+  margin-bottom:0 !important;
+}
+
+#era-select-screen .era-grid{
+  align-items:stretch;
+}
+
+@media(max-height:900px){
+  #era-select-screen,
+  #archive-screen{
+    padding-top:22px !important;
+    padding-bottom:36px !important;
+  }
+
+  #era-select-screen h2{
+    margin-bottom:12px !important;
+  }
+
+  #era-select-screen .era-grid{
+    padding-top:2px;
+  }
+}
+
+@media(max-width:760px){
+  #era-select-screen,
+  #archive-screen{
+    padding-top:18px !important;
+    padding-bottom:32px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1961,7 +2010,7 @@ function startCampaign(){
     startGame('PREHISTORIC');
 }
 function goToLobby(){SoundManager.playUI();state.gameState='LOBBY';state.running=true;state.paused=false;state.shopOpen=false;state.campaignMode=false;state.endlessMode=false;state.endlessBossCount=0;state.endlessNextBossAt=0;state.endlessBossInterval=0;state.endlessBossCountdownMs=0;state.endlessStartedAt=0;state.endlessLastBossEra=null;state.activeBoss=null;state.eraComplete=false;['game-over-screen','story-screen','tutorial-screen','era-complete-screen','archive-screen','era-select-screen','upgrade-screen','shop-screen','pause-screen'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));upgradeScreen.classList.remove('opacity-0');document.getElementById('lobby-screen').classList.remove('hidden');uiLayer.classList.add('hidden');campaignProgressEl.classList.add('hidden');bossUiEl.classList.add('hidden','opacity-0');bossUiEl.classList.remove('opacity-100');bossWarningEl.classList.remove('warning-flash');SoundManager.stopAmbientBGM();canvas.classList.remove('ultimate-active-filter');state.currentEra=null;enemies=[];projectiles=[];enemyProjectiles=[];drops=[];coinsList=[];specialItems=[];damageTexts=[];splatters=[];screenSplatters=[];particles=[];state.keys={};state.mouse.isDown=false;state.cameraShake=0;state.hitStop=0;if(artifactIndicator)artifactIndicator.classList.remove('show');chapterToast.classList.remove('show');eraEventToast.classList.remove('show');achievementToast.classList.remove('show');if(chapterToastHideTimer){clearTimeout(chapterToastHideTimer);chapterToastHideTimer=null;}achievementQueue=[];achievementShowing=false;if(achievementHideTimer){clearTimeout(achievementHideTimer);achievementHideTimer=null;}updateStyleLensPanel();buildEraCards();}
-function showEraSelect(){SoundManager.init();SoundManager.playUI();document.getElementById('lobby-screen').classList.add('hidden');eraCompleteScreen.classList.add('hidden');eraSelectScreen.classList.remove('hidden');buildEraCards();setDifficulty(state.difficulty);}
+function showEraSelect(){requestAnimationFrame(()=>{eraSelectScreen.scrollTop=0;});SoundManager.init();SoundManager.playUI();document.getElementById('lobby-screen').classList.add('hidden');eraCompleteScreen.classList.add('hidden');eraSelectScreen.classList.remove('hidden');buildEraCards();setDifficulty(state.difficulty);}
 function showEraSelectFromComplete(){state.paused=false;state.gameState='LOBBY';state.shopOpen=false;eraCompleteScreen.classList.add('hidden');uiLayer.classList.add('hidden');campaignProgressEl.classList.add('hidden');if(artifactIndicator)artifactIndicator.classList.remove('show');updateStyleLensPanel();SoundManager.stopAmbientBGM();eraSelectScreen.classList.remove('hidden');buildEraCards();}
 function hideEraSelect(){SoundManager.playUI();eraSelectScreen.classList.add('hidden');document.getElementById('lobby-screen').classList.remove('hidden');}
 function selectEra(era){
@@ -2047,7 +2096,7 @@ function updateArtifactIndicator(){
     artifactIndicator.classList.add('show');
 }
 function buildEraCards(){const grid=document.getElementById('era-grid');if(!grid)return;grid.innerHTML='';const restored=ERA_ORDER.filter(id=>museumSave.completed[id]).length;document.getElementById('era-completion-count').innerText=`${restored} / ${ERA_ORDER.length}`;ERA_ORDER.forEach(id=>{const c=ERA_CONFIGS[id],done=!!museumSave.completed[id];const card=document.createElement('div');card.className='era-card final-card';card.style.setProperty('--card-accent',c.accent);card.onclick=()=>selectEra(id);const art=`linear-gradient(135deg,${c.dark},${c.accent}44 55%,${c.dark}), repeating-linear-gradient(${c.index*17}deg,transparent 0 18px,${c.accent}22 18px 20px)`;card.innerHTML=`<div class="era-art" style="background:${art}"></div><div class="relative z-10 p-6 h-full min-h-[320px] flex flex-col justify-between"><div><div class="flex justify-between"><span class="font-cinzel text-[10px] tracking-[.35em]" style="color:${c.accent}">${c.code}</span><span class="${done?'complete-badge':'open-badge'} text-[9px] px-2 py-1 tracking-widest">${done?'RESTORED':'OPEN'}</span></div><p class="font-cinzel text-[9px] text-gray-600 tracking-[.2em] mt-7">${c.period}</p><h3 class="text-3xl font-serif-tc text-white mt-2 tracking-[.1em]">${c.name}</h3><p class="text-gray-500 text-xs mt-3 leading-relaxed">${c.zone}<br>${c.mechanic}</p></div><div class="border-t border-white/10 pt-4"><p class="text-[10px] text-gray-600 mb-2">BOSS</p><p class="font-serif-tc tracking-[.12em]" style="color:${c.accent}">${c.boss}</p><p class="font-cinzel text-[9px] text-gray-600 mt-1">${c.bossEn}</p>${museumSave.bestScores[id]?`<p class="text-[9px] text-gray-600 mt-3">BEST ${museumSave.bestScores[id].toLocaleString()} · ${formatTime(museumSave.bestTimes[id]||0)}</p>`:''}</div></div>`;grid.appendChild(card);});}
-function showArchive(){SoundManager.init();SoundManager.playUI();document.getElementById('lobby-screen').classList.add('hidden');eraSelectScreen.classList.add('hidden');archiveScreen.classList.remove('hidden');renderArchive();}
+function showArchive(){SoundManager.init();SoundManager.playUI();document.getElementById('lobby-screen').classList.add('hidden');eraSelectScreen.classList.add('hidden');archiveScreen.classList.remove('hidden');renderArchive();requestAnimationFrame(()=>{archiveScreen.scrollTop=0;});}
 function hideArchive(){archiveScreen.classList.add('hidden');document.getElementById('lobby-screen').classList.remove('hidden');}
 function renderArchive(){const summary=document.getElementById('archive-summary'),grid=document.getElementById('archive-grid'),ag=document.getElementById('achievement-grid');const restored=ERA_ORDER.filter(id=>museumSave.completed[id]).length;summary.innerHTML=[['RESTORED',`${restored}/10`],['TOTAL REPAIRS',museumSave.totalKills||0],['BOSSES',museumSave.totalBosses||0],['RUNS',museumSave.totalRuns||0]].map(x=>`<div class="archive-stat"><p class="font-cinzel text-[9px] text-gray-600 tracking-widest">${x[0]}</p><p class="font-cinzel text-2xl text-white mt-2">${x[1]}</p></div>`).join('');grid.innerHTML='';ERA_ORDER.forEach(id=>{const c=ERA_CONFIGS[id],done=!!museumSave.completed[id];const el=document.createElement('div');el.className='archive-card';el.style.setProperty('--accent',c.accent);el.innerHTML=`<p class="font-cinzel text-[9px] tracking-[.3em]" style="color:${c.accent}">${c.code} · ${done?'RESTORED':'UNRESOLVED'}</p><h4 class="font-serif-tc text-2xl text-white tracking-[.12em] mt-3">${c.name}</h4><p class="text-xs text-gray-500 mt-2 leading-relaxed">${c.period} · ${c.zone}</p><p class="text-xs text-gray-400 mt-4">敵人：${c.enemyNames.join('、')}</p><p class="text-xs mt-2" style="color:${c.accent}">失控巨作：${c.boss}</p>${done?`<p class="font-cinzel text-[9px] text-gray-600 mt-4">BEST ${museumSave.bestScores[id]||0} · ${formatTime(museumSave.bestTimes[id]||0)}</p>`:''}`;grid.appendChild(el);});ag.innerHTML='';ACHIEVEMENTS.forEach(a=>{const on=!!museumSave.achievements[a.id],el=document.createElement('div');el.className='archive-card';el.style.opacity=on?'1':'.42';el.innerHTML=`<p class="font-cinzel text-[9px] tracking-[.3em] ${on?'text-[#86efac]':'text-gray-600'}">${on?'UNLOCKED':'LOCKED'}</p><h4 class="font-serif-tc text-xl text-white mt-3">${a.title}</h4><p class="text-xs text-gray-500 mt-3">${a.desc}</p>`;ag.appendChild(el);});}
 function resetMuseumProgress(){if(!confirm('確定要清除本機所有時代通關與成就紀錄嗎？'))return;museumSave=defaultMuseumSave();persistMuseumSave();buildEraCards();renderArchive();}
