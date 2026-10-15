@@ -790,6 +790,112 @@ img, canvas {
   user-drag: none !important;
 }
 
+
+/* ===== Field Manual + Incident Dossier redesign ===== */
+.manual-overlay,.dossier-overlay{
+  padding:24px!important;
+  background:
+    radial-gradient(circle at 15% 10%,rgba(80,111,132,.16),transparent 30%),
+    linear-gradient(145deg,#0b0f14 0%,#111820 55%,#080b0f 100%)!important;
+}
+.manual-shell,.dossier-shell{
+  width:min(1180px,96vw);height:min(820px,92vh);
+  border-radius:26px;overflow:hidden;
+  box-shadow:0 30px 90px rgba(0,0,0,.5);
+}
+.manual-shell{background:#111923;border:1px solid rgba(255,255,255,.12);color:#edf2f4;}
+.manual-header{
+  height:92px;padding:18px 24px 16px 28px;display:grid;grid-template-columns:1fr auto 46px;align-items:center;gap:20px;
+  border-bottom:1px solid rgba(255,255,255,.11);background:#0d141c;
+}
+.manual-header p{font:700 10px Outfit,sans-serif;letter-spacing:.28em;color:#7f94a3;margin-bottom:5px;}
+.manual-header h2{font:800 30px 'Noto Serif TC',serif;letter-spacing:.08em;color:#f6f2ea;}
+.manual-version{font:700 10px Outfit,sans-serif;letter-spacing:.16em;color:#9fb0bc;border:1px solid #334552;border-radius:999px;padding:8px 12px;}
+.manual-close,.dossier-close{
+  width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.16);font-size:27px;line-height:1;color:#f3eee5;background:transparent;cursor:pointer;transition:.2s;
+}
+.manual-close:hover,.dossier-close:hover{background:#f3eee5;color:#111;transform:rotate(5deg);}
+.manual-layout{height:calc(100% - 92px);display:grid;grid-template-columns:230px 1fr;min-height:0;}
+.manual-nav{padding:22px 14px;background:#0c1219;border-right:1px solid rgba(255,255,255,.09);display:flex;flex-direction:column;gap:7px;}
+.manual-tab{
+  display:grid;grid-template-columns:34px 1fr;align-items:center;text-align:left;gap:6px;width:100%;padding:12px 13px;
+  border:1px solid transparent;border-radius:12px;color:#9fafba;background:transparent;font:700 13px 'Noto Sans TC',sans-serif;cursor:pointer;transition:.2s;
+}
+.manual-tab span{font:800 10px Outfit,sans-serif;letter-spacing:.1em;color:#607484;}
+.manual-tab:hover{background:#16222d;color:#fff;}
+.manual-tab.active{background:#e9e2d5;color:#181b1e;border-color:#e9e2d5;box-shadow:0 8px 22px rgba(0,0,0,.18);}
+.manual-tab.active span{color:#8a5c36;}
+.manual-nav-foot{margin-top:auto;padding:14px;border-top:1px solid rgba(255,255,255,.1);color:#7f929f;font-size:11px;line-height:1.55;}
+.manual-nav-foot b{font:800 9px Outfit,sans-serif;letter-spacing:.22em;color:#c89565;}
+.manual-pages{overflow-y:auto;padding:34px 42px 50px;background:#131c26;}
+.manual-section{display:none;max-width:820px;margin:0 auto;}
+.manual-section.active{display:block;animation:manualIn .22s ease both;}
+@keyframes manualIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.manual-page-head{padding-bottom:22px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:24px;}
+.manual-page-head>span{font:800 10px Outfit,sans-serif;letter-spacing:.24em;color:#c89565;}
+.manual-page-head h3{font:800 32px 'Noto Serif TC',serif;letter-spacing:.04em;color:#f4efe7;margin:7px 0 9px;}
+.manual-page-head p{font-size:14px;line-height:1.7;color:#aebbc3;max-width:700px;}
+.control-sheet{border-top:1px solid #30404d;}
+.control-row{display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:center;padding:13px 5px;border-bottom:1px solid #283743;}
+.control-row kbd,.style-manual-list kbd,.skill-manual-grid kbd,.ultimate-note kbd{
+  justify-self:start;border:1px solid #526876;border-bottom:3px solid #263742;background:#1a2832;color:#fff;border-radius:8px;
+  padding:6px 9px;font:800 11px ui-monospace,monospace;letter-spacing:.04em;box-shadow:none;text-shadow:none;
+}
+.control-row strong{display:block;color:#f5f1e9;font-size:14px;margin-bottom:2px;}
+.control-row span{display:block;color:#91a3ae;font-size:12px;line-height:1.45;}
+.manual-callout{margin-top:22px;padding:17px 18px;border-left:4px solid #c89565;background:#1b2731;border-radius:0 12px 12px 0;}
+.manual-callout b{color:#f1c99d;font-size:13px}.manual-callout p{color:#aebac2;font-size:12px;line-height:1.6;margin-top:4px;}
+.affinity-chain{display:grid;gap:8px;margin:6px 0 25px;}
+.affinity-chain>div{display:grid;grid-template-columns:18px 100px 1fr 100px;align-items:center;gap:10px;padding:10px 12px;background:#17232d;border:1px solid #293a47;border-radius:10px;}
+.affinity-chain i{width:12px;height:12px;border-radius:50%;background:var(--c);box-shadow:0 0 12px color-mix(in srgb,var(--c),transparent 35%);}
+.affinity-chain b{font-size:13px;color:#f4efe6}.affinity-chain span{font-size:10px;letter-spacing:.14em;color:#708795;text-align:center}.affinity-chain em{font-size:13px;font-style:normal;color:#c9d3d9;text-align:right;}
+.manual-grid-2,.skill-manual-grid,.mode-manual{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.manual-info-card,.skill-manual-grid article,.mode-manual article{background:#17232d;border:1px solid #2a3b47;border-radius:14px;padding:18px;}
+.manual-info-card span,.mode-manual article>span{font:800 9px Outfit,sans-serif;letter-spacing:.2em;color:#c89565;}
+.manual-info-card h4,.mode-manual h4{font:700 18px 'Noto Serif TC';color:#f5f0e8;margin:7px 0;}
+.manual-info-card p,.mode-manual p,.mode-manual li{font-size:12px;line-height:1.65;color:#9fb0ba;}
+.style-manual-list{display:grid;gap:10px;}
+.style-manual-list article{display:grid;grid-template-columns:46px 1fr auto;gap:14px;align-items:center;padding:14px 16px;border:1px solid #2a3944;border-left:5px solid var(--style);border-radius:12px;background:#16222c;}
+.style-manual-list h4{font:800 17px 'Noto Serif TC';color:#f4eee5}.style-manual-list p{font-size:12px;line-height:1.55;color:#9eafb9;margin-top:2px}.style-manual-list>article>span{font:700 10px Outfit,sans-serif;letter-spacing:.1em;color:#9cafba;background:#0d151b;padding:6px 8px;border-radius:999px;}
+.skill-manual-grid article{display:grid;grid-template-columns:42px 1fr;column-gap:12px;}
+.skill-manual-grid article>p{grid-column:1/-1;font-size:12px;line-height:1.55;color:#9eafb9;margin-top:13px;}
+.skill-manual-grid article div{display:flex;flex-direction:column;gap:2px}.skill-manual-grid b{font-size:15px;color:#f2ede5}.skill-manual-grid span{font:700 10px Outfit;color:#c89565;letter-spacing:.12em;}
+.ultimate-note{display:grid;grid-template-columns:54px 1fr;gap:14px;margin-top:16px;padding:17px;border:1px solid #594d71;background:#201c2c;border-radius:14px}.ultimate-note b{font:800 11px Outfit;letter-spacing:.17em;color:#d5b6ef}.ultimate-note p{font-size:12px;line-height:1.65;color:#baaeca;margin-top:4px;}
+.mode-manual article.endless{border-color:#6b2f35;background:#24181b}.mode-manual ul{margin:13px 0 0 16px;list-style:disc}.mode-manual li{margin:4px 0;}
+
+/* dossier */
+.dossier-shell{background:#e7dfd0;color:#1d1c1a;border:1px solid #b7aa96;}
+.dossier-header{height:92px;padding:16px 22px 15px 30px;display:grid;grid-template-columns:1fr 46px;align-items:center;border-bottom:2px solid #28231e;background:#d9cfbd;}
+.dossier-kicker{font:800 9px Outfit,sans-serif;letter-spacing:.3em;color:#6c6256;margin-bottom:4px}.dossier-header h2{font:900 29px 'Noto Serif TC';letter-spacing:.08em;color:#201d19}.dossier-header h2 span{font:800 11px Outfit;letter-spacing:.18em;color:#9c302d;margin-left:10px;}
+.dossier-close{color:#24201c;border-color:#7d7163}.dossier-close:hover{background:#24201c;color:#efe8dc;}
+.dossier-layout{height:calc(100% - 92px);display:grid;grid-template-columns:265px 1fr;min-height:0;}
+.dossier-meta{padding:26px 22px;background:#d1c5b1;border-right:1px solid #aa9b87;overflow-y:auto;}
+.dossier-stamp{display:inline-block;border:3px double #9e332f;color:#9e332f;padding:7px 10px;transform:rotate(-2deg);font:900 11px Outfit;letter-spacing:.15em;margin-bottom:23px;}
+.dossier-meta dl{display:grid;gap:0}.dossier-meta dl>div{padding:11px 0;border-top:1px solid #ad9f8b}.dossier-meta dt{font:800 8px Outfit;letter-spacing:.18em;color:#74695c}.dossier-meta dd{font:700 12px 'Noto Sans TC';color:#2a2621;margin-top:4px;line-height:1.4}.dossier-meta dd.danger{color:#982f2c;}
+.dossier-index-note{margin-top:24px;padding:13px;background:#c2b49f;border-left:3px solid #776755}.dossier-index-note strong{font:800 8px Outfit;letter-spacing:.2em;color:#5e5348}.dossier-index-note p{font-size:11px;line-height:1.55;color:#4b433a;margin-top:5px;}
+.dossier-document{overflow-y:auto;padding:34px 42px 54px;background:linear-gradient(90deg,rgba(79,58,38,.035) 1px,transparent 1px),#e9e2d5;background-size:24px 24px;}
+.dossier-title-block{max-width:780px;border-bottom:2px solid #29241f;padding-bottom:24px}.dossier-code{font:800 9px Outfit;letter-spacing:.26em;color:#8f332f}.dossier-title-block h3{font:900 35px 'Noto Serif TC';letter-spacing:.03em;color:#201d19;margin:8px 0 11px}.dossier-lead{font-size:14px;line-height:1.85;color:#4c443b;}
+.dossier-section{margin-top:28px;max-width:820px}.dossier-section-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}.dossier-section-head span{font:900 10px Outfit;color:#eee5d6;background:#2b2722;padding:5px 7px}.dossier-section-head h4{font:800 20px 'Noto Serif TC';color:#28231e;}
+.case-timeline{border-left:2px solid #9e8f7a;margin-left:23px}.case-timeline article{display:grid;grid-template-columns:72px 1fr;gap:14px;position:relative;padding:2px 0 19px 22px}.case-timeline article:before{content:'';position:absolute;left:-7px;top:6px;width:12px;height:12px;border:3px solid #e9e2d5;background:#8f332f;border-radius:50%}.case-timeline time{font:800 10px Outfit;letter-spacing:.1em;color:#8f332f}.case-timeline strong{font-size:14px;color:#28231e}.case-timeline p{font-size:12px;line-height:1.65;color:#62584d;margin-top:3px;}
+.dossier-two-col{display:grid;grid-template-columns:1fr 1fr;gap:28px}.dossier-checklist{display:grid;gap:8px}.dossier-checklist li{font-size:12px;color:#51483e;line-height:1.55;padding-left:20px;position:relative}.dossier-checklist li:before{content:'□';position:absolute;left:0;color:#8f332f;font-weight:900}.asset-tags{display:flex;flex-wrap:wrap;gap:6px}.asset-tags span{font:800 9px Outfit;letter-spacing:.08em;border:1px solid #998a76;padding:6px 8px;color:#51483e;background:#dfd5c5}.dossier-small{font-size:11px;line-height:1.65;color:#665b50;margin-top:10px;}
+.threat-file{max-width:820px;margin-top:30px;border:2px solid #8f332f;padding:18px 20px;display:grid;grid-template-columns:1fr auto;gap:8px 20px;background:#e5d5cf}.threat-file>div p{font:800 8px Outfit;letter-spacing:.22em;color:#8f332f}.threat-file h4{font:900 22px 'Noto Serif TC';color:#6f2523;margin-top:3px}.threat-level{align-self:center;font:900 11px Outfit;letter-spacing:.12em;color:#fff;background:#8f332f;padding:7px 10px}.threat-file>p{grid-column:1/-1;font-size:12px;line-height:1.7;color:#59443f;}
+.dossier-directive{max-width:820px;margin:28px 0 0;padding:18px 20px;border-left:6px solid #2d2924;background:#d9cfbd;font:700 17px 'Noto Serif TC';color:#29241f;line-height:1.65}.dossier-directive span{display:block;font:800 8px Outfit;letter-spacing:.24em;color:#7b6c5c;margin-bottom:5px;}
+
+@media(max-width:760px){
+ .manual-overlay,.dossier-overlay{padding:0!important;}
+ .manual-shell,.dossier-shell{width:100vw;height:100vh;border-radius:0;border:0;}
+ .manual-header,.dossier-header{height:78px;padding:12px 14px;}.manual-header{grid-template-columns:1fr 42px}.manual-version{display:none}
+ .manual-header h2,.dossier-header h2{font-size:23px}
+ .manual-layout{height:calc(100% - 78px);display:flex;flex-direction:column}
+ .manual-nav{padding:8px;display:flex;flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid rgba(255,255,255,.09)}
+ .manual-tab{flex:0 0 auto;width:auto;grid-template-columns:auto auto;padding:9px 10px}.manual-nav-foot{display:none}
+ .manual-pages{padding:22px 16px 38px}
+ .manual-page-head h3{font-size:26px}.control-row{grid-template-columns:105px 1fr;gap:10px}
+ .manual-grid-2,.skill-manual-grid,.mode-manual{grid-template-columns:1fr}.style-manual-list article{grid-template-columns:42px 1fr}.style-manual-list>article>span{display:none}
+ .dossier-layout{height:calc(100% - 78px);display:block;overflow-y:auto}.dossier-meta{border-right:0;border-bottom:1px solid #aa9b87;padding:16px}.dossier-meta dl{grid-template-columns:1fr 1fr;gap:0 14px}.dossier-index-note{display:none}
+ .dossier-document{overflow:visible;padding:24px 16px 40px}.dossier-title-block h3{font-size:28px}.dossier-two-col{grid-template-columns:1fr}.threat-file{grid-template-columns:1fr}.threat-level{justify-self:start}.case-timeline article{grid-template-columns:55px 1fr}
+}
+
 </style>
 </head>
 <body>
@@ -873,78 +979,223 @@ img, canvas {
         </div>
     </div>
 
-    <!-- 故事背景畫面 -->
-    <div id="story-screen" class="screen-overlay hidden-screen interactive">
-        <p class="font-serif-tc text-[#d4af37] tracking-[0.4em] text-xs mb-2 uppercase">Archives</p>
-        <h2 class="text-4xl font-serif-tc font-light mb-8 text-white tracking-[0.1em]">絕對美術館館藏紀錄</h2>
-        
-        <div class="tutorial-card mb-8 backdrop-blur-xl h-[65vh] overflow-y-auto custom-scrollbar flex flex-col items-center justify-center text-center" style="max-width: 800px; width: 90%;">
-            <div class="elegant-line mb-8 opacity-30 w-1/3"></div>
-            <p class="text-gray-300 font-light text-lg md:text-xl leading-loose tracking-widest mb-6">宇宙的本質並非粒子，而是<span class="text-white font-medium drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">「筆觸」</span>。</p>
-            <p class="text-gray-300 font-light text-lg md:text-xl leading-loose tracking-widest mb-6">這座跨越維度的<strong class="text-[#d4af37] font-normal drop-shadow-[0_0_8px_rgba(212,175,55,0.6)]">「絕對美術館」</strong><br>收容了人類歷史上所有的美學概念與現實法則。</p>
-            <p class="text-gray-300 font-light text-lg md:text-xl leading-loose tracking-widest mb-6">然而，名為<span class="text-red-400 font-medium drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]">「留白 (The Blank)」</span>的虛無現象正在侵蝕館藏。<br>畫作中的怪物逃逸，不同畫派的法則相互碰撞，引發了美學大崩壞。</p>
-            <p class="text-gray-300 font-light text-lg md:text-xl leading-loose tracking-widest mb-10">你，<strong class="text-white font-medium">修復師第 7 號</strong>。<br>帶著義肢畫筆「創世紀」在此甦醒。</p>
-            <p class="text-[#d4af37] font-serif-tc text-2xl tracking-[0.2em] font-medium">用色彩，重新定義這個崩壞的世界。</p><p class="text-[#b9855d] font-serif-tc text-sm tracking-[0.16em] mt-7">十道裂縫已同時展開：從史前洞穴、古典神殿、哥德教堂，一路延伸到數位故障世界。</p>
-            <div class="elegant-line mt-8 opacity-30 w-1/3"></div>
-        </div>
-        <button onclick="hideStory()" class="btn-elegant px-12 py-4 font-serif-tc font-semibold rounded-sm text-lg tracking-[0.2em] uppercase hover:bg-white hover:text-black transition-colors">關閉檔案</button>
-    </div>
-
-    <!-- 教學畫面 -->
-    <div id="tutorial-screen" class="screen-overlay hidden-screen interactive">
-        <p class="font-serif-tc text-[#d4af37] tracking-[0.4em] text-xs mb-2 uppercase">展覽手冊</p>
-        <h2 class="text-4xl font-serif-tc font-light mb-8 text-white tracking-[0.1em]">策展指南</h2>
-        
-        <div class="tutorial-card mb-8 backdrop-blur-xl h-[75vh] overflow-y-auto pr-6 custom-scrollbar" style="max-width: 900px; width: 95%;">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+    <!-- 檔案紀錄：案件卷宗版 -->
+    <div id="story-screen" class="screen-overlay hidden interactive dossier-overlay">
+        <div class="dossier-shell">
+            <header class="dossier-header">
                 <div>
-                    <div class="mb-6">
-                        <h3 class="text-sm font-serif-tc text-gray-400 tracking-[0.2em] mb-4 border-b border-white/10 pb-2 uppercase">I. 基礎操作</h3>
-                        <ul class="text-gray-300 font-light space-y-3 text-[14px] leading-relaxed">
-                            <li class="flex items-center"><div class="min-w-[100px]"><kbd class="key-btn">W A S D</kbd></div> <span>移動策展人</span></li>
-                            <li class="flex items-center"><div class="min-w-[100px]"><kbd class="key-btn">SPACE</kbd></div> <span class="text-[#d4af37]">無敵空間閃避</span></li>
-                            <li class="flex items-center"><div class="min-w-[100px]"><kbd class="key-btn">左鍵</kbd></div> <span>攻擊</span></li>
-                            <li class="flex items-center"><div class="min-w-[100px]"><kbd class="key-btn">滾輪</kbd></div> <span class="text-[#93c5fd]">快速切換畫派</span></li>
-                            <li class="flex items-center mt-2 border-t border-white/5 pt-2"><div class="min-w-[100px]"><kbd class="key-btn">B</kbd></div> <span class="text-[#fcd34d] font-bold tracking-widest">黑市畫商</span></li>
-                            <li class="flex items-center mt-1"><div class="min-w-[100px]"><kbd class="key-btn">Q</kbd></div> <span class="text-[#f472b6] font-bold tracking-widest">各畫派專屬大絕</span></li><li class="flex items-center mt-1"><div class="min-w-[100px]"><kbd class="key-btn">E R F C</kbd></div> <span class="text-cyan-300 font-bold tracking-widest">主動技能：色爆／凝時／修復／裂隙</span></li>
-                            <li class="flex items-center mt-1"><div class="min-w-[100px]"><kbd class="key-btn">ESC/P</kbd></div> <span class="text-white tracking-widest">暫停遊戲</span></li>
-                        </ul>
+                    <p class="dossier-kicker">ABSOLUTE MUSEUM / INCIDENT FILE</p>
+                    <h2>檔案紀錄 <span>DA-07</span></h2>
+                </div>
+                <button class="dossier-close" onclick="hideStory()" aria-label="關閉檔案紀錄">×</button>
+            </header>
+
+            <div class="dossier-layout">
+                <aside class="dossier-meta">
+                    <div class="dossier-stamp">ACTIVE CASE</div>
+                    <dl>
+                        <div><dt>FILE NO.</dt><dd>DA-CHRONO-07</dd></div>
+                        <div><dt>SUBJECT</dt><dd>修復師第 7 號</dd></div>
+                        <div><dt>DEVICE</dt><dd>義肢畫筆「創世紀」</dd></div>
+                        <div><dt>THREAT</dt><dd class="danger">THE BLANK</dd></div>
+                        <div><dt>STATUS</dt><dd>ONGOING RESTORATION</dd></div>
+                        <div><dt>ACCESS</dt><dd>CURATOR / LEVEL 07</dd></div>
+                    </dl>
+                    <div class="dossier-index-note">
+                        <strong>INDEX NOTE</strong>
+                        <p>此頁為事件摘要，不是操作說明。戰鬥按鍵與系統規則請至「操作手冊」。</p>
                     </div>
-                    
-                    <div class="mb-4">
-                        <h3 class="text-sm font-serif-tc text-[#c58a58] tracking-[0.2em] mb-4 border-b border-white/10 pb-2 uppercase">II. FINAL：十年代時間線</h3><p class="text-gray-400 text-[12px] leading-relaxed mb-4">每個年代都要先修復指定數量的侵蝕體，再迎戰該時代的「失控巨作」Boss。各年代具有不同環境異常；五大畫派武器在所有年代皆可自由切換。</p><h3 class="text-sm font-serif-tc text-gray-400 tracking-[0.2em] mb-4 border-b border-white/10 pb-2 uppercase">III. 五大畫派武器</h3>
-                        <div class="space-y-3 text-[13px]">
-                            <div class="bg-white/5 p-2 rounded-r border-l-4 border-[#93c5fd] flex items-start gap-2"><kbd class="key-btn">1</kbd> <div><strong class="text-[#93c5fd]">印象派 (蒼藍)</strong>: 輕柔極速射擊。</div></div>
-                            <div class="bg-white/5 p-2 rounded-r border-l-4 border-[#fca5a5] flex items-start gap-2"><kbd class="key-btn">2</kbd> <div><strong class="text-[#fca5a5]">野獸派 (赤紅)</strong>: 狂野扇形高傷。</div></div>
-                            <div class="bg-white/5 p-2 rounded-r border-l-4 border-[#fde047] flex items-start gap-2"><kbd class="key-btn">3</kbd> <div><strong class="text-[#fde047]">普普藝術 (鮮黃)</strong>: 巨型穿透文字。</div></div>
-                            <div class="bg-white/5 p-2 rounded-r border-l-4 border-[#c084fc] flex items-start gap-2"><kbd class="key-btn">4</kbd> <div><strong class="text-[#c084fc]">立體派 (紫晶)</strong>: 緩慢但無限穿透。</div></div>
-                            <div class="bg-white/5 p-2 rounded-r border-l-4 border-[#86efac] flex items-start gap-2"><kbd class="key-btn">5</kbd> <div><strong class="text-[#86efac]">超現實 (翠綠)</strong>: 自動追蹤流體。</div></div>
+                </aside>
+
+                <main class="dossier-document custom-scrollbar">
+                    <section class="dossier-title-block">
+                        <p class="dossier-code">CASE / DISORDERLY AESTHETICS</p>
+                        <h3>絕對美術館失序事件</h3>
+                        <p class="dossier-lead">宇宙的本質並非粒子，而是「筆觸」。絕對美術館保存人類歷史中的美學概念與現實法則；當「留白」開始侵蝕館藏，時代之間的界線失效，藝術作品中的異常體開始外洩。</p>
+                    </section>
+
+                    <section class="dossier-section">
+                        <div class="dossier-section-head"><span>01</span><h4>事件時間線</h4></div>
+                        <div class="case-timeline">
+                            <article>
+                                <time>T−00</time>
+                                <div><strong>留白現象出現</strong><p>未知的虛無侵蝕館藏內容，畫作與時代資料開始產生缺損。</p></div>
+                            </article>
+                            <article>
+                                <time>T+01</time>
+                                <div><strong>時代裂縫同步展開</strong><p>史前洞穴、古典神殿、中世紀、文藝復興、巴洛克、浮世繪、印象派、現代主義、普普藝術與數位時代同時受到干擾。</p></div>
+                            </article>
+                            <article>
+                                <time>T+02</time>
+                                <div><strong>失控巨作甦醒</strong><p>每個年代的核心作品轉化為高威脅異常體，並帶動周圍侵蝕體增殖。</p></div>
+                            </article>
+                            <article>
+                                <time>T+03</time>
+                                <div><strong>修復師第 7 號啟動</strong><p>授權使用「創世紀」與五種畫派戰鬥模組，進入時代迴廊執行修復。</p></div>
+                            </article>
                         </div>
-                    </div>
-                </div>
+                    </section>
 
-                <div>
-                    <h3 class="text-sm font-serif-tc text-[#d4af37] tracking-[0.2em] mb-4 border-b border-[#d4af37]/30 pb-2 uppercase">IV. 屬性調和</h3>
-                    <p class="text-gray-300 font-light text-[13px] mb-4 leading-relaxed">
-                        觀察敵人的<strong class="text-white">靈氣顏色</strong>切換武器。克制造成 <strong class="text-[#d4af37] bg-[#d4af37]/10 px-1 rounded">200% 傷害</strong>，被克制僅 50%。
-                    </p>
-                    
-                    <div class="bg-[#0a0a0c]/80 rounded-lg border border-white/10 p-4 space-y-4 shadow-inner text-[13px]">
-                        <div class="flex items-center justify-between"><div class="flex items-center gap-2 w-[40%]"><span class="tut-color-box bg-[#93c5fd] text-[#93c5fd]"></span><span class="font-bold text-[#93c5fd]">蒼藍 (1)</span></div><div class="text-gray-500 text-[10px] tracking-widest text-center font-serif-tc">➔ 滅 ➔</div><div class="flex items-center justify-end gap-2 w-[40%]"><span class="font-bold text-[#fca5a5]">赤紅敵</span><span class="tut-color-box bg-[#fca5a5] text-[#fca5a5]"></span></div></div>
-                        <div class="flex items-center justify-between"><div class="flex items-center gap-2 w-[40%]"><span class="tut-color-box bg-[#fca5a5] text-[#fca5a5]"></span><span class="font-bold text-[#fca5a5]">赤紅 (2)</span></div><div class="text-gray-500 text-[10px] tracking-widest text-center font-serif-tc">➔ 燒 ➔</div><div class="flex items-center justify-end gap-2 w-[40%]"><span class="font-bold text-[#86efac]">翠綠敵</span><span class="tut-color-box bg-[#86efac] text-[#86efac]"></span></div></div>
-                        <div class="flex items-center justify-between"><div class="flex items-center gap-2 w-[40%]"><span class="tut-color-box bg-[#86efac] text-[#86efac]"></span><span class="font-bold text-[#86efac]">翠綠 (5)</span></div><div class="text-gray-500 text-[10px] tracking-widest text-center font-serif-tc">➔ 破 ➔</div><div class="flex items-center justify-end gap-2 w-[40%]"><span class="font-bold text-[#fde047]">鮮黃敵</span><span class="tut-color-box bg-[#fde047] text-[#fde047]"></span></div></div>
-                        <div class="flex items-center justify-between"><div class="flex items-center gap-2 w-[40%]"><span class="tut-color-box bg-[#fde047] text-[#fde047]"></span><span class="font-bold text-[#fde047]">鮮黃 (3)</span></div><div class="text-gray-500 text-[10px] tracking-widest text-center font-serif-tc">➔ 碎 ➔</div><div class="flex items-center justify-end gap-2 w-[40%]"><span class="font-bold text-[#c084fc]">紫晶敵</span><span class="tut-color-box bg-[#c084fc] text-[#c084fc]"></span></div></div>
-                        <div class="flex items-center justify-between"><div class="flex items-center gap-2 w-[40%]"><span class="tut-color-box bg-[#c084fc] text-[#c084fc]"></span><span class="font-bold text-[#c084fc]">紫晶 (4)</span></div><div class="text-gray-500 text-[10px] tracking-widest text-center font-serif-tc">➔ 吸 ➔</div><div class="flex items-center justify-end gap-2 w-[40%]"><span class="font-bold text-[#93c5fd]">蒼藍敵</span><span class="tut-color-box bg-[#93c5fd] text-[#93c5fd]"></span></div></div>
-                    </div>
-                    
-                    <div class="mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded text-[12px] text-red-200 font-light leading-relaxed">
-                        <strong class="font-serif-tc tracking-widest text-red-400 block mb-1 font-bold">警告:</strong>
-                        無腦連打將導致無效攻擊！請靈活切換 <kbd class="key-btn mx-1">1~5</kbd>。
-                    </div>
-                </div>
+                    <section class="dossier-section dossier-two-col">
+                        <div>
+                            <div class="dossier-section-head"><span>02</span><h4>任務目標</h4></div>
+                            <ul class="dossier-checklist">
+                                <li>進入受污染的藝術年代。</li>
+                                <li>清除侵蝕體並恢復年代穩定度。</li>
+                                <li>封印該年代的失控巨作 Boss。</li>
+                                <li>收集修復紀錄並持續前往下一個年代。</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div class="dossier-section-head"><span>03</span><h4>已知作戰資產</h4></div>
+                            <div class="asset-tags">
+                                <span>IMPRESSIONISM</span><span>FAUVISM</span><span>POP ART</span><span>CUBISM</span><span>SURREALISM</span>
+                            </div>
+                            <p class="dossier-small">五種畫派模組可即時切換；其射擊形式、節奏與專屬大絕皆不同。</p>
+                        </div>
+                    </section>
+
+                    <section class="threat-file">
+                        <div>
+                            <p>PRIMARY THREAT</p>
+                            <h4>留白 / THE BLANK</h4>
+                        </div>
+                        <span class="threat-level">CLASS Ω</span>
+                        <p>目前無法確認「留白」是敵對生命、自然現象，或是美學概念本身的崩解。所有直接接觸資料均持續失真。</p>
+                    </section>
+
+                    <blockquote class="dossier-directive">
+                        <span>CURATOR DIRECTIVE</span>
+                        「用色彩，重新定義這個崩壞的世界。」
+                    </blockquote>
+                </main>
             </div>
         </div>
-        <button onclick="hideTutorial()" class="btn-elegant px-12 py-4 font-serif-tc font-semibold rounded-sm text-lg tracking-[0.2em] uppercase hover:bg-white hover:text-black transition-colors">關閉手冊</button>
+    </div>
+
+    <!-- 操作手冊：Field Manual 分頁版 -->
+    <div id="tutorial-screen" class="screen-overlay hidden interactive manual-overlay">
+        <div class="manual-shell">
+            <header class="manual-header">
+                <div>
+                    <p>FIELD MANUAL / RESTORER 07</p>
+                    <h2>操作手冊</h2>
+                </div>
+                <div class="manual-version">REV. 6.2 · CURRENT BUILD</div>
+                <button class="manual-close" onclick="hideTutorial()" aria-label="關閉操作手冊">×</button>
+            </header>
+
+            <div class="manual-layout">
+                <nav class="manual-nav" aria-label="操作手冊章節">
+                    <button class="manual-tab active" data-manual-tab="quick" onclick="setManualSection('quick')"><span>00</span>快速上手</button>
+                    <button class="manual-tab" data-manual-tab="combat" onclick="setManualSection('combat')"><span>01</span>戰鬥規則</button>
+                    <button class="manual-tab" data-manual-tab="styles" onclick="setManualSection('styles')"><span>02</span>五大畫派</button>
+                    <button class="manual-tab" data-manual-tab="skills" onclick="setManualSection('skills')"><span>03</span>技能與大絕</button>
+                    <button class="manual-tab" data-manual-tab="modes" onclick="setManualSection('modes')"><span>04</span>遊戲模式</button>
+                    <div class="manual-nav-foot">
+                        <b>TIP</b>
+                        <p>畫派不是職業鎖定。戰鬥中可隨時用 1–5 或滾輪切換。</p>
+                    </div>
+                </nav>
+
+                <main class="manual-pages custom-scrollbar">
+                    <section class="manual-section active" data-manual-section="quick">
+                        <div class="manual-page-head">
+                            <span>00 / QUICK START</span>
+                            <h3>30 秒開始戰鬥</h3>
+                            <p>先記住移動、攻擊、閃避與切畫派；其他系統可邊玩邊學。</p>
+                        </div>
+                        <div class="control-sheet">
+                            <div class="control-row"><kbd>W A S D</kbd><div><strong>移動</strong><span>八方向移動，斜向速度已正規化。</span></div></div>
+                            <div class="control-row"><kbd>左鍵</kbd><div><strong>攻擊</strong><span>朝游標方向持續使用目前畫派武器。</span></div></div>
+                            <div class="control-row"><kbd>SPACE</kbd><div><strong>閃避</strong><span>高速位移；閃避期間可避開傷害。</span></div></div>
+                            <div class="control-row"><kbd>1–5 / 滾輪</kbd><div><strong>切換畫派</strong><span>依敵人顏色與戰況快速換武器。</span></div></div>
+                            <div class="control-row"><kbd>Q</kbd><div><strong>畫派大絕</strong><span>能量全滿後施放目前畫派的專屬大絕。</span></div></div>
+                            <div class="control-row"><kbd>E R F C</kbd><div><strong>主動技能</strong><span>爆發、凝時、修復與位移四種共用技能。</span></div></div>
+                            <div class="control-row"><kbd>B</kbd><div><strong>黑市畫商</strong><span>暫停戰鬥並用藝術經費購買強化。</span></div></div>
+                            <div class="control-row"><kbd>ESC / P</kbd><div><strong>暫停</strong><span>暫停戰鬥與無盡 Boss 倒數。</span></div></div>
+                        </div>
+                        <div class="manual-callout"><b>最重要的第一件事</b><p>不要固定只用一種畫派。敵人帶有顏色屬性，正確切換畫派能顯著提高輸出。</p></div>
+                    </section>
+
+                    <section class="manual-section" data-manual-section="combat">
+                        <div class="manual-page-head">
+                            <span>01 / COMBAT RULES</span>
+                            <h3>屬性調和與 Boss 流程</h3>
+                            <p>敵人的外圈顏色代表屬性。克制攻擊造成 200% 傷害，被抵抗時僅造成 50%。</p>
+                        </div>
+                        <div class="affinity-chain">
+                            <div><i style="--c:#2563eb"></i><b>蒼藍 1</b><span>克制</span><em>赤紅</em></div>
+                            <div><i style="--c:#b91c1c"></i><b>赤紅 2</b><span>克制</span><em>翠綠</em></div>
+                            <div><i style="--c:#15803d"></i><b>翠綠 5</b><span>克制</span><em>鮮黃</em></div>
+                            <div><i style="--c:#8a5a00"></i><b>鮮黃 3</b><span>克制</span><em>紫晶</em></div>
+                            <div><i style="--c:#7e22ce"></i><b>紫晶 4</b><span>克制</span><em>蒼藍</em></div>
+                        </div>
+                        <div class="manual-grid-2">
+                            <article class="manual-info-card"><span>PHASE A</span><h4>修復侵蝕體</h4><p>普通關卡先累積指定修復數量。HUD 上方會顯示進度。</p></article>
+                            <article class="manual-info-card"><span>PHASE B</span><h4>失控巨作</h4><p>進度達成後 Boss 甦醒。Boss 沒有一般屬性克制，但可吃 Boss 傷害天賦。</p></article>
+                            <article class="manual-info-card"><span>SURVIVAL</span><h4>利用位移</h4><p>Space、C 技能與移速強化是主要保命來源，不要只靠回血硬扛。</p></article>
+                            <article class="manual-info-card"><span>BUILD</span><h4>避免單一路線</h4><p>天賦已設上限，滿值選項不會再佔用四選一欄位。</p></article>
+                        </div>
+                    </section>
+
+                    <section class="manual-section" data-manual-section="styles">
+                        <div class="manual-page-head">
+                            <span>02 / STYLE MODULES</span>
+                            <h3>五大畫派武器</h3>
+                            <p>每種畫派都有不同射擊節奏與定位。以下為目前平衡版定位。</p>
+                        </div>
+                        <div class="style-manual-list">
+                            <article style="--style:#2563eb"><kbd>1</kbd><div><h4>印象派</h4><p>高射速、穩定持續輸出，適合走位與快速反應。</p></div><span>持續輸出</span></article>
+                            <article style="--style:#b91c1c"><kbd>2</kbd><div><h4>野獸派</h4><p>近距離霰彈爆發高，但射擊節奏慢，需要貼近風險。</p></div><span>近戰爆發</span></article>
+                            <article style="--style:#8a5a00"><kbd>3</kbd><div><h4>普普藝術</h4><p>大尺寸文字彈與高穿透，擅長同時處理多個敵人。</p></div><span>群體清場</span></article>
+                            <article style="--style:#7e22ce"><kbd>4</kbd><div><h4>立體派</h4><p>射速較慢但單發重、穿透強，適合直線與密集敵群。</p></div><span>重擊穿透</span></article>
+                            <article style="--style:#15803d"><kbd>5</kbd><div><h4>超現實</h4><p>雙發追蹤流體，瞄準壓力低，擅長追擊與續航。</p></div><span>自動追蹤</span></article>
+                        </div>
+                    </section>
+
+                    <section class="manual-section" data-manual-section="skills">
+                        <div class="manual-page-head">
+                            <span>03 / ACTIVE SYSTEMS</span>
+                            <h3>主動技能與畫派大絕</h3>
+                            <p>主動技能共用於全部畫派；Q 大絕則會依施放瞬間的畫派改變。</p>
+                        </div>
+                        <div class="skill-manual-grid">
+                            <article><kbd>E</kbd><div><b>色彩爆裂</b><span>9 秒</span></div><p>向全方向發射筆觸，適合被包圍時清場。</p></article>
+                            <article><kbd>R</kbd><div><b>凝時畫框</b><span>20 秒</span></div><p>凍結敵人與敵方彈幕約 3 秒。</p></article>
+                            <article><kbd>F</kbd><div><b>修復領域</b><span>28 秒</span></div><p>恢復生命、增加護盾並獲得短暫無敵。</p></article>
+                            <article><kbd>C</kbd><div><b>時代裂隙</b><span>13 秒</span></div><p>朝游標瞬移，清除附近部分彈幕並造成範圍傷害。</p></article>
+                        </div>
+                        <div class="ultimate-note">
+                            <kbd>Q</kbd>
+                            <div><b>STYLE ULTIMATE</b><p>印象派偏機動持續輸出；野獸派偏爆發；普普偏清場；立體派偏控制穿透；超現實偏追蹤與續航。</p></div>
+                        </div>
+                    </section>
+
+                    <section class="manual-section" data-manual-section="modes">
+                        <div class="manual-page-head">
+                            <span>04 / MODES</span>
+                            <h3>一般遠征與無盡策展</h3>
+                            <p>兩個模式使用相同戰鬥系統，但通關條件完全不同。</p>
+                        </div>
+                        <div class="mode-manual">
+                            <article>
+                                <span>CAMPAIGN</span>
+                                <h4>進入策展任務</h4>
+                                <p>從史前藝術開始依序挑戰十個年代。每個年代都有專屬異常、敵人與 Boss，完成後留下最佳分數與時間。</p>
+                                <ul><li>固定年代順序</li><li>Boss 擊敗後結算</li><li>適合體驗完整內容</li></ul>
+                            </article>
+                            <article class="endless">
+                                <span>∞ ENDLESS</span>
+                                <h4>無盡策展</h4>
+                                <p>無時間限制。普通敵人持續刷新，Boss 會從不同年代隨機入侵並逐步變強。</p>
+                                <ul><li>Boss 隨機年代</li><li>擊敗 Boss 不會結束</li><li>記錄最佳生存、分數與 Boss 數</li></ul>
+                            </article>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
     </div>
 
     <canvas id="gameCanvas"></canvas>
@@ -1751,11 +2002,21 @@ function hideStory() {
     document.getElementById('lobby-screen').classList.remove('hidden'); 
 }
 
+
+function setManualSection(id){
+    const screen=document.getElementById('tutorial-screen');
+    if(!screen)return;
+    screen.querySelectorAll('[data-manual-section]').forEach(el=>el.classList.toggle('active',el.dataset.manualSection===id));
+    screen.querySelectorAll('[data-manual-tab]').forEach(el=>el.classList.toggle('active',el.dataset.manualTab===id));
+    const pages=screen.querySelector('.manual-pages');if(pages)pages.scrollTop=0;
+}
+
 function showTutorial() { 
     SoundManager.init(); SoundManager.playUI();
     eraSelectScreen.classList.add('hidden'); 
     document.getElementById('lobby-screen').classList.add('hidden'); 
-    document.getElementById('tutorial-screen').classList.remove('hidden'); 
+    document.getElementById('tutorial-screen').classList.remove('hidden');
+    setManualSection('quick');
 }
 function hideTutorial() { 
     SoundManager.playUI(); 
