@@ -1058,7 +1058,7 @@ img, canvas {
     </div>
 
     <!-- 大廳畫面 -->
-    <div id="lobby-screen" class="screen-overlay interactive overflow-hidden">
+    <div id="lobby-screen" class="screen-overlay interactive overflow-hidden hidden">
         <div id="lobby-content" class="w-full h-full flex flex-col items-center justify-center transition-transform duration-100 ease-out relative z-10">
             <div class="text-center mb-16 relative flex flex-col items-center">
                 <p class="font-serif-tc text-gray-500 tracking-[0.4em] text-sm mb-6 uppercase">FIELD CONSOLE / 絕對美術館</p>
@@ -2090,6 +2090,15 @@ function skipStoryTyping(){
     while(storyIndex<STORY_SCRIPT.length){appendStoryLine(STORY_SCRIPT[storyIndex],storyIndex);storyIndex++;}
     finishStoryTyping();
 }
+function bootIntoStoryArchive(){
+    eraSelectScreen.classList.add('hidden');
+    document.getElementById('tutorial-screen').classList.add('hidden');
+    document.getElementById('lobby-screen').classList.add('hidden');
+    document.getElementById('story-screen').classList.remove('hidden');
+    resetStoryTyping();
+    storyTypingTimer=setTimeout(typeNextStoryLine,240);
+}
+
 function showStory(){
     SoundManager.init();SoundManager.playUI();
     eraSelectScreen.classList.add('hidden');
@@ -3810,6 +3819,7 @@ function gameLoop(rafNow=performance.now()) {
 buildEraCards();
 setDifficulty('CURATOR');
 updateUIStyle();
+bootIntoStoryArchive();
 requestAnimationFrame(gameLoop);
 
 </script>
